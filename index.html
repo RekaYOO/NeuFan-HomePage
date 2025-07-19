@@ -54,13 +54,38 @@
 
         header input {
             padding: 10px;
-            width: 80%;
-            max-width: 400px;
+            width: 60%;
+            max-width: 300px;
             margin-top: 20px;
             border: none;
             border-radius: 5px;
             font-size: 1rem;
             outline: none;
+        }
+
+        .webvpn-button {
+            padding: 10px 15px;
+            margin-left: 10px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #fff;
+        }
+
+        .webvpn-button.inactive {
+            background-color: #666;
+        }
+
+        .webvpn-button.active {
+            background-color: #ff6b35;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .webvpn-button:hover {
+            transform: translateY(-1px);
         }
 
         main {
@@ -242,7 +267,20 @@
     <div id="app">
         <header>
             <h1><a href="https://neu.edu.cn">NEU</a>FAN直达</h1>
-            <input type="text" v-model="searchQuery" placeholder="搜索网站..." />
+            <div style="display: flex; justify-content: center; align-items: center; flex-wrap: wrap;">
+                <input type="text" v-model="searchQuery" placeholder="搜索网站..." />
+                <button v-if="!isVpnDirectMode" 
+                        class="webvpn-button" 
+                        :class="{ active: webvpnMode, inactive: !webvpnMode }"
+                        @click="toggleWebVPN">
+                    {{ webvpnMode ? '已开启' : '从校内访问' }}
+                </button>
+                <button v-if="isVpnDirectMode"
+                        class="webvpn-button active"
+                        @click="handleVpnDirectJump">
+                    从校内访问它
+                </button>
+            </div>
             <div class="nav-buttons">
                 <a v-for="page in pages" 
                    :key="page.id"
@@ -264,8 +302,8 @@
                             <div class="links">
                                 <a v-for="link in category.links" 
                                    :key="link.name" 
-                                   :href="link.url"
-                                   target="">
+                                   :href="webvpnMode ? '#' : link.url"
+                                   @click="handleLinkClick($event, link.url, category.name)">
                                     {{ link.name }}
                                 </a>
                             </div>
@@ -293,6 +331,144 @@
                 const pageOrder = ['quick', 'neu', 'tool','ai'];
                 const currentIndex = ref(0);
                 const useAnimation = ref(false);
+                const webvpnMode = ref(false);
+
+                // 实现AES-CFB模式的加密函数
+                // 通过资源访问控制系统访问校内网址功能实现参考自https://github.com/w43322/neu-webvpn-anysite/tree/main
+                async function encryptUrlBrowser(url) {
+                    const keyString = 'b0A58a69394ce73@';
+                    const ivString = 'b0A58a69394ce73@';
+
+                    const keyBytes = new TextEncoder().encode(keyString);
+                    const ivBytes = new TextEncoder().encode(ivString);
+
+                    // 导入AES密钥
+                    const aesKey = await crypto.subtle.importKey(
+                        'raw',
+                        keyBytes,
+                        { name: 'AES-CBC' },
+                        false,
+                        ['encrypt']
+                    );
+
+                    // CFB-128模式
+                    async function aes_cfb_encrypt(plaintext, key, iv) {
+                        const blockSize = 16;
+                        const result = new Uint8Array(plaintext.length);
+                        let shiftRegister = new Uint8Array(iv);
+
+                        for (let i = 0; i < plaintext.length; i += blockSize) {
+                            // 加密移位寄存器
+                            const paddedRegister = new Uint8Array(blockSize);
+                            paddedRegister.set(shiftRegister);
+                            
+                            const encryptedBlock = await crypto.subtle.encrypt(
+                                { name: 'AES-CBC', iv: new Uint8Array(16) },
+                                key,
+                                paddedRegister
+                            );
+                            
+                            const keyStream = new Uint8Array(encryptedBlock).slice(0, blockSize);
+                            
+                            // XOR操作
+                            const chunkSize = Math.min(blockSize, plaintext.length - i);
+                            const cipherChunk = new Uint8Array(chunkSize);
+                            
+                            for (let j = 0; j < chunkSize; j++) {
+                                cipherChunk[j] = plaintext[i + j] ^ keyStream[j];
+                                result[i + j] = cipherChunk[j];
+                            }
+                            
+                            // 更新移位寄存器 (CFB-128: 整个块都用作反馈)
+                            if (i + blockSize < plaintext.length) {
+                                shiftRegister = cipherChunk.length === blockSize ? 
+                                    cipherChunk : 
+                                    new Uint8Array([...shiftRegister.slice(chunkSize), ...cipherChunk]);
+                            }
+                        }
+                        
+                        return result;
+                    }
+
+                    const paddedLength = Math.floor(url.length / 16) * 16 + 16;
+                    let paddedUrl = url;
+                    while (paddedUrl.length < paddedLength) {
+                        paddedUrl += '\0';
+                    }
+
+                    const plaintext = new TextEncoder().encode(paddedUrl);
+                    const ciphertext = await aes_cfb_encrypt(plaintext, aesKey, ivBytes);
+                    
+                    const slicedCipherText = ciphertext.slice(0, url.length);
+                    const hexCipherText = Array.from(slicedCipherText)
+                        .map(b => b.toString(16).padStart(2, '0'))
+                        .join('');
+
+                    return 'https://webvpn.neu.edu.cn/http/62304135386136393339346365373340' + hexCipherText;
+                }
+
+                // 处理URL的函数
+                const getProcessedUrl = (originalUrl) => {
+                    if (!webvpnMode.value) {
+                        return originalUrl;
+                    }
+                    
+                    // 移除协议前缀，只保留域名和路径
+                    let cleanUrl = originalUrl.replace(/^https?:\/\//, '');
+                    
+                    // 如果是异步加密，我们需要在组件中处理
+                    // 这里先返回原URL，实际加密在点击时处理
+                    return originalUrl;
+                };
+
+                // 切换模式
+                const toggleWebVPN = () => {
+                    webvpnMode.value = !webvpnMode.value;
+                };
+
+                // 判断是否支持访问
+                const isWebVPNSupported = (url, currentPage, categoryName) => {
+                    // 只支持快速页面的"平台"分类和校内页面的所有分类
+                    if (currentPage === 'quick' && categoryName === '平台') {
+                        return true;
+                    }
+                    if (currentPage === 'neu') {
+                        return true;
+                    }
+                    return false;
+                };
+
+                // 处理链接点击事件
+                const handleLinkClick = async (event, originalUrl, categoryName = '') => {
+                    // 处理直接跳转
+                    if (originalUrl.startsWith('vpn ')) {
+                        event.preventDefault();
+                        const domain = originalUrl.slice(4);
+                        try {
+                            const encryptedUrl = await encryptUrlBrowser(domain);
+                            window.location.href = encryptedUrl;
+                        } catch (error) {
+                            console.error('跳转失败:', error);
+                            alert('此地址无法从校内访问，请检查地址正确性');
+                        }
+                        return;
+                    }
+                    
+                    if (webvpnMode.value && isWebVPNSupported(originalUrl, currentPage.value, categoryName)) {
+                        event.preventDefault();
+                        // 移除协议前缀，只保留域名（去掉路径和参数）
+                        let cleanUrl = originalUrl.replace(/^https?:\/\//, '');
+                        // 只保留域名部分，去掉路径
+                        cleanUrl = cleanUrl.split('/')[0];
+                        try {
+                            const encryptedUrl = await encryptUrlBrowser(cleanUrl);
+                            window.location.href = encryptedUrl; // 在当前页面打开
+                        } catch (error) {
+                            console.error('加密失败:', error);
+                            window.location.href = originalUrl; // 在当前页面打开原链接
+                        }
+                    }
+                };
 
                 // 页面配置
                 const pages = ref([
@@ -330,11 +506,11 @@
                 },
                 {
                     "name": "工商管理",
-                    "url": "http://sba.neu.edu.cn/"
+                    "url": "http://sba.neu.edu.cn"
                 },
                 {
                     "name": "图书馆",
-                    "url": "http://www.lib.neu.edu.cn/index.html"
+                    "url": "http://www.lib.neu.edu.cn"
                 },
                 {
                     "name": "创院平台",
@@ -619,6 +795,36 @@
     ]
 });
 
+                // 检查是否是直接跳转模式
+                const isVpnDirectMode = computed(() => {
+                    return searchQuery.value.trim().toLowerCase().startsWith('vpn:');
+                });
+
+                // 获取跳转域名
+                const vpnDirectDomain = computed(() => {
+                    if (isVpnDirectMode.value) {
+                        return searchQuery.value.slice(4).trim();
+                    }
+                    return '';
+                });
+
+                // 处理直接跳转
+                const handleVpnDirectJump = async () => {
+                    const domain = vpnDirectDomain.value;
+                    if (!domain) {
+                        alert('请输入有效的域名');
+                        return;
+                    }
+                    
+                    try {
+                        const encryptedUrl = await encryptUrlBrowser(domain);
+                        window.location.href = encryptedUrl;
+                    } catch (error) {
+                        console.error('跳转失败:', error);
+                        alert('失败，请检查域名格式');
+                    }
+                };
+
                 // 处理页面切换
                 const handlePageChange = (pageId, withAnimation = false) => {
                     useAnimation.value = withAnimation;
@@ -635,16 +841,59 @@
 
                 // 根据当前页面和搜索条件过滤书签
                 const filteredCategories = computed(() => {
+                    const query = searchQuery.value.trim();
+                    
+                    // 检查是否是直接跳转命令
+                    if (query.toLowerCase().startsWith('vpn ')) {
+                        const domain = query.slice(4).trim();
+                        if (domain) {
+                            return [{
+                                name: '校内访问',
+                                links: [{
+                                    name: `跳转到 ${domain}`,
+                                    url: `vpn:${domain}`,
+                                    isVpnDirect: true
+                                }]
+                            }];
+                        }
+                    }
+                    
+                    // 如果有搜索条件，从所有页面搜索
+                    if (query) {
+                        const allResults = [];
+                        const lowerQuery = query.toLowerCase();
+                        
+                        // 遍历所有页面
+                        Object.keys(bookmarks.value).forEach(pageKey => {
+                            const pageBookmarks = bookmarks.value[pageKey];
+                            pageBookmarks.forEach(category => {
+                                const matchedLinks = category.links.filter(link =>
+                                    link.name.toLowerCase().includes(lowerQuery) ||
+                                    link.url.toLowerCase().includes(lowerQuery)
+                                );
+                                
+                                if (matchedLinks.length > 0) {
+                                    // 找到匹配的分类，添加页面信息
+                                    const pageInfo = pages.value.find(p => p.id === pageKey);
+                                    allResults.push({
+                                        name: `${category.name} (${pageInfo ? pageInfo.name : pageKey})`,
+                                        links: matchedLinks
+                                    });
+                                }
+                            });
+                        });
+                        
+                        return allResults;
+                    }
+                    
+                    // 没有搜索条件时，显示当前页面内容
                     const currentBookmarks = bookmarks.value[currentPage.value] || [];
                     return currentBookmarks.map(category => {
                         return {
                             ...category,
-                            links: category.links.filter(link =>
-                                link.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-                                link.url.toLowerCase().includes(searchQuery.value.toLowerCase())
-                            )
+                            links: category.links
                         };
-                    }).filter(category => category.links.length > 0);
+                    });
                 });
 
                 return {
@@ -655,7 +904,15 @@
                     pages,
                     handlePageChange,
                     handleArrowClick,
-                    useAnimation
+                    useAnimation,
+                    webvpnMode,
+                    toggleWebVPN,
+                    getProcessedUrl,
+                    handleLinkClick,
+                    isWebVPNSupported,
+                    isVpnDirectMode,
+                    vpnDirectDomain,
+                    handleVpnDirectJump
                 };
             }
         }).mount('#app');
