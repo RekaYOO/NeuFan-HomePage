@@ -272,7 +272,8 @@
                 <button v-if="!isVpnDirectMode" 
                         class="webvpn-button" 
                         :class="{ active: webvpnMode, inactive: !webvpnMode }"
-                        @click="toggleWebVPN">
+                        @click="toggleWebVPN"
+                        :title="webvpnMode ? '此功能仅可访问校内网站' : ''">
                     {{ webvpnMode ? '已开启' : '从校内访问' }}
                 </button>
                 <button v-if="isVpnDirectMode"
@@ -426,17 +427,17 @@
                     webvpnMode.value = !webvpnMode.value;
                 };
 
-                // 判断是否支持访问
-                const isWebVPNSupported = (url, currentPage, categoryName) => {
-                    // 只支持快速页面的"平台"分类和校内页面的所有分类
-                    if (currentPage === 'quick' && categoryName === '平台') {
-                        return true;
-                    }
-                    if (currentPage === 'neu') {
-                        return true;
-                    }
-                    return false;
-                };
+                // 判断是否支持访问 - 移除此函数，所有网址都支持
+                // const isWebVPNSupported = (url, currentPage, categoryName) => {
+                //     // 只支持快速页面的"平台"分类和校内页面的所有分类
+                //     if (currentPage === 'quick' && categoryName === '平台') {
+                //         return true;
+                //     }
+                //     if (currentPage === 'neu') {
+                //         return true;
+                //     }
+                //     return false;
+                // };
 
                 // 处理链接点击事件
                 const handleLinkClick = async (event, originalUrl, categoryName = '') => {
@@ -454,7 +455,7 @@
                         return;
                     }
                     
-                    if (webvpnMode.value && isWebVPNSupported(originalUrl, currentPage.value, categoryName)) {
+                    if (webvpnMode.value) {
                         event.preventDefault();
                         // 移除协议前缀，只保留域名（去掉路径和参数）
                         let cleanUrl = originalUrl.replace(/^https?:\/\//, '');
@@ -909,7 +910,6 @@
                     toggleWebVPN,
                     getProcessedUrl,
                     handleLinkClick,
-                    isWebVPNSupported,
                     isVpnDirectMode,
                     vpnDirectDomain,
                     handleVpnDirectJump
