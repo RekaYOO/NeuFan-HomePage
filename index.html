@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<!--MYGO-->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEUFAN直达</title>
+    <link rel="icon" type="image/jpg" href="./icon.jpg">
+    <!-- 引入 Vue 3 -->
+    <script src="https://unpkg.com/vue@3.2.31/dist/vue.global.js"></script>
+    <style>
+        .beian {
+            background-color: #f5f5f5;
+            padding: 10px;
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .beian a {
+            color: #666;
+            text-decoration: none;
+        }
+
+        .beian a:hover {
+            text-decoration: underline;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Vrdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+
+        header {
+            background-color: #4CAF50;
+            color: #fff;
+            padding: 40px 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+
+        header h1 a {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        header input {
+            padding: 10px;
+            width: 80%;
+            max-width: 400px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        main {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-bottom: 50px;
+            position: relative;
+            min-height: 500px;
+        }
+
+        .content-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .page-container {
+            position: absolute;
+            width: 100%;
+            left: 0;
+            top: 0;
+            transition: transform 0.5s ease;
+        }
+
+        .page-container[data-index="0"] {
+            transform: translateX(0);
+        }
+
+        .page-container[data-index="1"] {
+            transform: translateX(100%);
+        }
+
+        .page-container[data-index="2"] {
+            transform: translateX(200%);
+        }
+
+        .page-container.active {
+            transform: translateX(0) !important;
+        }
+
+        .slide-enter-active,
+        .slide-leave-active {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: absolute;
+            width: 100%;
+        }
+
+        .slide-enter-from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+
+        .slide-leave-to {
+            transform: translateX(-100%);
+            opacity: 0;
+        }
+
+        section {
+            margin-bottom: 30px;
+        }
+
+        section h2 {
+            color: #4CAF50;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+
+        .links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .links a {
+            background-color: #fff;
+            padding: 15px 25px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #333;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            flex: 1 1 calc(25% - 15px);
+            text-align: center;
+        }
+
+        .links a:hover {
+            background-color: #e0e0e0;
+            transform: translateY(-2px);
+        }
+
+        .footer-beian {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(51, 51, 51, 0.9);
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        .footer-beian:hover {
+            opacity: 0.8;
+        }
+
+        .nav-buttons {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .nav-buttons a,
+        .arrow-button {
+            padding: 10px;
+            background-color: #fff;
+            color: #4CAF50;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-right: 10px;
+            transition: all 0.3s;
+            display: inline-block;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .nav-buttons a:hover,
+        .arrow-button:hover {
+            background-color: #e0e0e0;
+            transform: translateY(-1px);
+        }
+
+        .nav-buttons a.active,
+        .arrow-button.active {
+            background-color: #c8e6c9;
+            color: #2e7d32;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .arrow-button:active {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 768px) {
+            .links a {
+                flex: 1 1 calc(50% - 15px);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .links a {
+                flex: 1 1 100%;
+            }
+
+            header h1 {
+                font-size: 2rem;
+            }
+
+            section h2 {
+                font-size: 1.5rem;
+            }
+        }
+
+        .content-wrapper {
+            position: relative;
+            min-height: 500px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <header>
+            <h1><a href="https://neu.edu.cn">NEU</a>FAN直达</h1>
+            <input type="text" v-model="searchQuery" placeholder="搜索网站..." />
+            <div class="nav-buttons">
+                <a v-for="page in pages" 
+                   :key="page.id"
+                   :class="{ active: currentPage === page.id }"
+                   @click="handlePageChange(page.id)">
+                    {{ page.name }}
+                </a>
+                <button class="arrow-button" @click="handleArrowClick">
+                    ➡️
+                </button>
+            </div>
+        </header>
+        <main>
+            <div class="content-wrapper">
+                <transition :name="useAnimation ? 'slide' : ''" mode="out-in">
+                    <div :key="currentPage">
+                        <section v-for="category in filteredCategories" :key="category.name">
+                            <h2>{{ category.name }}</h2>
+                            <div class="links">
+                                <a v-for="link in category.links" 
+                                   :key="link.name" 
+                                   :href="link.url"
+                                   target="">
+                                    {{ link.name }}
+                                </a>
+                            </div>
+                        </section>
+                    </div>
+                </transition>
+            </div>
+        </main>
+
+        <!-- 浮动备案信息 
+        <div class="footer-beian" v-if="showBeian" @click="showBeian = false">
+            <p><a href="http://beian.miit.gov.cn" style="color: #fff; text-decoration: underline;">滇ICP备2025051314号</a></p>
+        </div>
+        -->
+    </div>
+
+    <script>
+        const { createApp, ref, computed } = Vue;
+
+        createApp({
+            setup() {
+                const searchQuery = ref('');
+                const showBeian = ref(true);
+                const currentPage = ref('quick');
+                const pageOrder = ['quick', 'neu', 'tool','ai'];
+                const currentIndex = ref(0);
+                const useAnimation = ref(false);
+
+                // 页面配置
+                const pages = ref([
+                    { id: 'quick', name: '快速' },
+                    { id: 'neu', name: '校内' },
+                    { id: 'tool', name: '工具' },
+                    { id: 'ai', name: 'AI' }
+                ]);
+
+                // 书签数据
+                const bookmarks = ref({
+    "quick": [
+        {
+            "name": "平台",
+            "links": [
+                {
+                    "name": "教务系统",
+                    "url": "http://219.216.96.4/eams/"
+                },
+                {
+                    "name": "一网通办",
+                    "url": "http://eone.neu.edu.cn"
+                },
+                {
+                    "name": "信息门户",
+                    "url": "https://portal.neu.edu.cn"
+                },
+                {
+                    "name": "统一资源",
+                    "url": "https://webvpn.neu.edu.cn"
+                },
+                {
+                    "name": "数学机考",
+                    "url": "http://mathe.neu.edu.cn"
+                },
+                {
+                    "name": "工商管理",
+                    "url": "http://sba.neu.edu.cn/"
+                },
+                {
+                    "name": "图书馆",
+                    "url": "http://www.lib.neu.edu.cn/index.html"
+                },
+                {
+                    "name": "创院平台",
+                    "url": "http://cxcy.neu.edu.cn/m"
+                }
+            ]
+        },
+        {
+            "name": "课程",
+            "links": [
+                {
+                    "name": "希冀",
+                    "url": "http://neucsecg.neu.edu.cn"
+                },
+                {
+                    "name": "MATHE",
+                    "url": "http://neumathe.cn"
+                },
+                {
+                    "name": "慕课",
+                    "url": "https://www.icourse163.org/"
+                },
+                {
+                    "name": "超星平台",
+                    "url": "http://dbdx.fanya.chaoxing.com/portal"
+                },
+                {
+                    "name": "批改网",
+                    "url": "https://www.pigai.org/"
+                },
+                {
+                    "name": "BB平台",
+                    "url": "https://bb.neu.edu.cn"
+                }
+            ]
+        },
+        {
+            "name": "AI",
+            "links": [
+                {
+                    "name": "豆包",
+                    "url": "https://www.doubao.com/chat/"
+                },
+                {
+                    "name": "DeepSeek",
+                    "url": "https://chat.deepseek.com/"
+                },
+                {
+                    "name": "通义",
+                    "url": "https://tongyi.aliyun.com/qianwen/"
+                },
+                {
+                    "name": "GPT",
+                    "url": "https://chatgpt.com"
+                },
+                {
+                    "name": "MiniMax",
+                    "url": "https://chat.minimaxi.com/"
+                }
+            ]
+        },
+        {
+            "name": "本站",
+            "links": [
+                {
+                    "name": "Filebox",
+                    "url": "http://filebox.neu.fan"
+                },
+                {
+                    "name": "TOOLS",
+                    "url": "http://113.44.139.48:40116"
+                },
+                {
+                    "name": "Draw",
+                    "url": "http://draw.neu.fan"
+                }
+            ]
+        }
+    ],
+    "neu": [
+        {
+            "name": "公告",
+            "links": [
+                {
+                    "name": "后勤",
+                    "url": "http://hqfw.neu.edu.cn/"
+                },
+                {
+                    "name": "学生指导中心",
+                    "url": "http://zdfw.neu.edu.cn/"
+                },
+                {
+                    "name": "信息公开",
+                    "url": "http://info.neu.edu.cn/"
+                },
+                {
+                    "name": "基建",
+                    "url": "http://jjch.neu.edu.cn/"
+                },
+                {
+                    "name": "资产处",
+                    "url": "http://zcc.neu.edu.cn"
+                }
+            ]
+        },
+        {
+            "name": "资料",
+            "links": [
+                {
+                    "name": "研招网",
+                    "url": "http://yz.neu.edu.cn/"
+                },
+                {
+                    "name": "就业信息网",
+                    "url": "http://job.neu.edu.cn"
+                },
+                {
+                    "name": "招聘会",
+                    "url": "http://job.neu.edu.cn/jobfair"
+                }
+            ]
+        },
+        {
+            "name": "学习事务",
+            "links": [
+                {
+                    "name": "教务BB",
+                    "url": "https://bb.neu.edu.cn/"
+                },
+                {
+                    "name": "教务处",
+                    "url": "http://aao.neu.edu.cn"
+                },
+                {
+                    "name": "NEX",
+                    "url": "https://www.neu-nex.fun"
+                }
+            ]
+        },
+        {
+            "name": "生活服务",
+            "links": [
+                {
+                    "name": "IP网关",
+                    "url": "https://ipgw.neu.edu.cn"
+                },
+                {
+                    "name": "电话簿",
+                    "url": "https://plat.neu.edu.cn/telephone-directory/home"
+                },
+                {
+                    "name": "勤工助学",
+                    "url": "http://qzzx.neu.edu.cn/HomePage.aspx"
+                },
+                {
+                    "name": "浑南管委会",
+                    "url": "http://hnxqgwh.neu.edu.cn"
+                }
+            ]
+        }
+    ],
+    "tool": [
+        {
+            "name": "实用",
+            "links": [
+                {
+                    "name": "直线拟合",
+                    "url": "http://linify.me"
+                },
+                {
+                    "name": "卫星云图",
+                    "url": "https://zoom.earth/"
+                },
+                {
+                    "name": "贝贝工具",
+                    "url": "https://xbeibeix.com/"
+                },
+                {
+                    "name": "校内VPN生成",
+                    "url": "https://hazuki.ren/webvpn/"
+                },
+                {
+                    "name": "AI检测",
+                    "url": "https://app.gptzero.me/app"
+                }
+            ]
+        },
+        {
+            "name": "学习",
+            "links": [
+                {
+                    "name": "流程图",
+                    "url": "https://excalidraw.com/"
+                },
+                {
+                    "name": "linux使用指南",
+                    "url": "https://missing.lcpu.dev/#VPContent"
+                },
+                {
+                    "name": "Wolframalpha",
+                    "url": "https://www.wolframalpha.com/"
+                },
+                {
+                    "name": "GGB",
+                    "url": "https://www.geogebra.org/calculator"
+                }
+            ]
+        },
+        {
+            "name": "趣味",
+            "links": [
+                {
+                    "name": "BA生成器",
+                    "url": "http://symbolon.pages.dev"
+                },
+                {
+                    "name": "帮你BING",
+                    "url": "https://letmebingthatforyou.com/"
+                },
+                {
+                    "name": "oOo0O",
+                    "url": "https://ooooooooooooooooooooooo.ooo/"
+                },
+                {
+                    "name": "颜文字JS",
+                    "url": "https://utf-8.jp/public/aaencode.html"
+                }
+            ]
+        }
+    ],
+    "ai": [
+        {
+            "name": "语言",
+            "links": [
+                {
+                    "name": "Grok",
+                    "url": "https://grok.com/"
+                },
+                {
+                    "name": "Gemini",
+                    "url": "https://gemini.google.com/app"
+                },
+                {
+                    "name": "GPT",
+                    "url": "https://chatgpt.com"
+                },
+                {
+                    "name": "Qwen",
+                    "url": "https://chat.qwen.ai/"
+                },
+                {
+                    "name": "Claude",
+                    "url": "https://claude.ai"
+                },
+                {
+                    "name": "智谱",
+                    "url": "https://chatglm.cn/main?lang=zh"
+                },
+                {
+                    "name": "豆包",
+                    "url": "https://www.doubao.com/chat/"
+                },
+                {
+                    "name": "通义",
+                    "url": "https://www.tongyi.com/qianwen/"
+                },
+                {
+                    "name": "MiniMax",
+                    "url": "https://chat.minimaxi.com/"
+                }
+            ]
+        },
+        {
+            "name": "工具",
+            "links": [
+                {
+                    "name": "PPT-Gamma",
+                    "url": "www.gamma.site"
+                }
+            ]
+        }
+    ]
+});
+
+                // 处理页面切换
+                const handlePageChange = (pageId, withAnimation = false) => {
+                    useAnimation.value = withAnimation;
+                    const newIndex = pageOrder.indexOf(pageId);
+                    currentIndex.value = newIndex;
+                    currentPage.value = pageId;
+                };
+
+                // 处理箭头按钮点击
+                const handleArrowClick = () => {
+                    const nextIndex = (currentIndex.value + 1) % pageOrder.length;
+                    handlePageChange(pageOrder[nextIndex], true);
+                };
+
+                // 根据当前页面和搜索条件过滤书签
+                const filteredCategories = computed(() => {
+                    const currentBookmarks = bookmarks.value[currentPage.value] || [];
+                    return currentBookmarks.map(category => {
+                        return {
+                            ...category,
+                            links: category.links.filter(link =>
+                                link.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+                                link.url.toLowerCase().includes(searchQuery.value.toLowerCase())
+                            )
+                        };
+                    }).filter(category => category.links.length > 0);
+                });
+
+                return {
+                    searchQuery,
+                    filteredCategories,
+                    showBeian,
+                    currentPage,
+                    pages,
+                    handlePageChange,
+                    handleArrowClick,
+                    useAnimation
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+<div class="beian">
+    <a href="https://beian.miit.gov.cn" target="_blank">滇ICP备2025051314号</a>
+</div>
+</html>
