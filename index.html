@@ -272,14 +272,8 @@
                 <button v-if="!isVpnDirectMode" 
                         class="webvpn-button" 
                         :class="{ active: webvpnMode, inactive: !webvpnMode }"
-<<<<<<< Updated upstream
-                        @click="toggleWebVPN"
-                        :title="webvpnMode ? '此功能仅可访问校内网站' : ''">
-                    {{ webvpnMode ? '已开启' : '从校内访问' }}
-=======
                         @click="toggleWebVPN">
                     {{ webvpnMode ? '已开启' : '校内模式' }}
->>>>>>> Stashed changes
                 </button>
                 <button v-if="isVpnDirectMode"
                         class="webvpn-button active"
@@ -470,14 +464,9 @@
                         }
                         return;
                     }
-<<<<<<< Updated upstream
-                    
-                    if (webvpnMode.value) {
-=======
 
                     // 处理直接访问链接
                     if (linkData && linkData.isDirectAccess) {
->>>>>>> Stashed changes
                         event.preventDefault();
 
                         if (webvpnMode.value) {
