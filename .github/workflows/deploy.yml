@@ -1,0 +1,37 @@
+name: Deploy index.html to Server
+
+on:
+  push:
+    paths:
+      - 'index.html'
+    branches:
+      - main  # 根据你的默认分支名称修改，可能是 master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to server via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SERVER_PORT }}
+          script: |
+            echo "Starting deployment..."
+            
+      - name: Copy file to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SERVER_PORT }}
+          source: "index.html"
+          target: "/opt/1panel/apps/openresty/openresty/www/sites/www.neu.fan/index"
+          overwrite: true
