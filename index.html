@@ -183,6 +183,17 @@
             transform: translateY(-2px);
         }
 
+        .links a.link-disabled {
+            background-color: #f0f0f0;
+            color: #999;
+            cursor: not-allowed;
+        }
+
+        .links a.link-disabled:hover {
+            background-color: #f0f0f0;
+            transform: none;
+        }
+
         .footer-beian {
             position: fixed;
             bottom: 0;
@@ -219,6 +230,8 @@
             border: none;
             cursor: pointer;
             font-size: 1rem;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .nav-buttons a:hover,
@@ -289,7 +302,8 @@
                 <a v-for="page in filteredPages" 
                    :key="page.id"
                    :class="{ active: currentPage === page.id }"
-                   @click="handlePageChange(page.id)">
+                   @mouseenter="!pageLocked && handlePageChange(page.id)"
+                   @click="handlePageClick(page.id)">
                     {{ page.name }}
                 </a>
                 <button class="arrow-button" @click="handleArrowClick">
@@ -306,7 +320,8 @@
                             <div class="links">
                                 <a v-for="link in category.links"
                                    :key="link.name"
-                                   :href="webvpnMode > 0 ? '#' : link.url"
+                                   :href="link.disabled ? '#' : (webvpnMode > 0 ? '#' : link.url)"
+                                   :class="{ 'link-disabled': link.disabled }"
                                    @click="handleLinkClick($event, link.url, category.name, link)">
                                     {{ link.name }}
                                 </a>
@@ -337,6 +352,8 @@
                 const useAnimation = ref(false);
                 // 0: 直连模式, 1: 校内模式(http), 2: 备用模式(https)
                 const webvpnMode = ref(0);
+                // 是否锁定页面（禁用悬浮切换）
+                const pageLocked = ref(false);
 
                 // 隐藏列表 - 这些名称默认不显示，需要 ?t=all 参数才显示
                 const hiddenItems = ['工具'];
@@ -476,6 +493,12 @@
 
                 // 处理链接点击事件
                 const handleLinkClick = async (event, originalUrl, categoryName = '', linkData = null) => {
+                    // 如果链接被禁用，阻止点击
+                    if (linkData && linkData.disabled) {
+                        event.preventDefault();
+                        return;
+                    }
+
                     // 解析URL，获取协议、域名、端口、路径
                     const parseUrl = (url) => {
                         const protocol = url.startsWith('https://') ? 'https' : 'http';
@@ -509,6 +532,26 @@
                         } catch (error) {
                             console.error('跳转失败:', error);
                             alert('此地址无法从校内访问，请检查地址正确性');
+                        }
+                        return;
+                    }
+
+                    // 处理学术情景搜索生成的按钮（新标签页打开）
+                    if (linkData && linkData.isAcademicAccess) {
+                        event.preventDefault();
+
+                        if (webvpnMode.value > 0) {
+                            try {
+                                const { protocol, domain, port, pathPart } = parseUrl(originalUrl);
+                                const encryptedDomainUrl = await encryptUrlBrowser(domain, protocol, port);
+                                const finalUrl = encryptedDomainUrl + pathPart;
+                                window.open(finalUrl, '_blank');
+                                searchQuery.value = ''; // 清空输入框
+                            } catch (error) {
+                                console.error('WebVPN访问失败:', error);
+                                window.open(originalUrl, '_blank');
+                                searchQuery.value = ''; // 清空输入框
+                            }
                         }
                         return;
                     }
@@ -1048,6 +1091,18 @@
                     currentPage.value = pageId;
                 };
 
+                // 处理页面按钮点击（切换锁定状态）
+                const handlePageClick = (pageId) => {
+                    if (currentPage.value === pageId) {
+                        // 点击当前页面，切换锁定状态
+                        pageLocked.value = !pageLocked.value;
+                    } else {
+                        // 点击其他页面，切换并锁定
+                        handlePageChange(pageId);
+                        pageLocked.value = true;
+                    }
+                };
+
                 // 处理箭头按钮点击
                 const handleArrowClick = () => {
                     const currentIdx = filteredPageOrder.value.indexOf(currentPage.value);
@@ -1084,6 +1139,30 @@
                             }];
                         }
                     }
+
+                    // 检查域名是否存在于学术板块
+                    const checkAcademicDomain = (url) => {
+                        let cleanUrl = url.replace(/^https?:\/\//, '');
+                        const pathIndex = cleanUrl.indexOf('/');
+                        const hostPart = pathIndex > -1 ? cleanUrl.substring(0, pathIndex) : cleanUrl;
+                        // 移除端口号
+                        const domain = hostPart.replace(/:\d+$/, '');
+                        
+                        const academicBookmarks = bookmarks.value['academic'] || [];
+                        for (const category of academicBookmarks) {
+                            for (const link of category.links) {
+                                let linkDomain = link.url.replace(/^https?:\/\//, '');
+                                const linkPathIndex = linkDomain.indexOf('/');
+                                linkDomain = linkPathIndex > -1 ? linkDomain.substring(0, linkPathIndex) : linkDomain;
+                                linkDomain = linkDomain.replace(/:\d+$/, '');
+                                
+                                if (domain === linkDomain || domain.endsWith('.' + linkDomain) || linkDomain.endsWith('.' + domain)) {
+                                    return true;
+                                }
+                            }
+                        }
+                        return false;
+                    };
 
                     // 如果有搜索条件，从所有页面搜索
                     if (query) {
@@ -1124,14 +1203,31 @@
                                 processedUrl = 'https://' + query;
                             }
 
-                            allResults.push({
-                                name: '直接访问',
-                                links: [{
-                                    name: `访问 ${query}`,
-                                    url: processedUrl,
-                                    isDirectAccess: true
-                                }]
-                            });
+                            // 检查是否是学术数据库域名
+                            const isAcademic = checkAcademicDomain(processedUrl);
+                            
+                            if (isAcademic) {
+                                // 学术数据库域名
+                                allResults.push({
+                                    name: '此数据库支持校园网免费访问',
+                                    links: [{
+                                        name: webvpnMode.value > 0 ? `访问 ${query}` : '请打开校内模式',
+                                        url: processedUrl,
+                                        isDirectAccess: true,
+                                        isAcademicAccess: true,
+                                        disabled: webvpnMode.value === 0
+                                    }]
+                                });
+                            } else {
+                                allResults.push({
+                                    name: '直接访问',
+                                    links: [{
+                                        name: `访问 ${query}`,
+                                        url: processedUrl,
+                                        isDirectAccess: true
+                                    }]
+                                });
+                            }
                         }
 
                         return allResults;
@@ -1153,7 +1249,9 @@
                     showBeian,
                     currentPage,
                     filteredPages,
+                    pageLocked,
                     handlePageChange,
+                    handlePageClick,
                     handleArrowClick,
                     useAnimation,
                     webvpnMode,
