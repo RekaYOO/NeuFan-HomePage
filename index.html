@@ -1000,12 +1000,12 @@
                     "url": "https://www.webofscience.com"
                 },
                 {
-                    "name": "Elsevier",
-                    "url": "https://www.sciencedirect.com/"
-                },
-                {
                     "name": "Springer",
                     "url": "https://link.springer.com/"
+                },
+                {
+                    "name": "ScienceDirect",
+                    "url": "https://www.sciencedirect.com/"
                 },
                 {
                     "name": "Wiley",
@@ -1206,12 +1206,17 @@
                             // 检查是否是学术数据库域名
                             const isAcademic = checkAcademicDomain(processedUrl);
                             
+                            // 限制显示文本长度
+                            const truncateText = (text, maxLength = 30) => {
+                                return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+                            };
+                            
                             if (isAcademic) {
                                 // 学术数据库域名
                                 allResults.push({
                                     name: '此数据库支持校园网免费访问',
                                     links: [{
-                                        name: webvpnMode.value > 0 ? `访问 ${query}` : '请打开校内模式',
+                                        name: webvpnMode.value > 0 ? `访问 ${truncateText(query)}` : '请打开校内模式',
                                         url: processedUrl,
                                         isDirectAccess: true,
                                         isAcademicAccess: true,
@@ -1222,7 +1227,7 @@
                                 allResults.push({
                                     name: '直接访问',
                                     links: [{
-                                        name: `访问 ${query}`,
+                                        name: `访问 ${truncateText(query)}`,
                                         url: processedUrl,
                                         isDirectAccess: true
                                     }]
