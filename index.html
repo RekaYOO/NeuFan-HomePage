@@ -1113,9 +1113,18 @@
                 // 检查输入是否为有效的URL
                 const isValidUrl = (string) => {
                     try {
-                        // 检查是否包含域名格式
-                        const urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/i;
-                        return urlPattern.test(string) || string.includes('.');
+                        // 简化的URL检测，避免正则表达式灾难性回溯
+                        // 检查是否包含域名格式（至少有一个点，且不全是数字）
+                        if (!string.includes('.')) return false;
+                        
+                        // 移除协议前缀
+                        const withoutProtocol = string.replace(/^https?:\/\//, '');
+                        
+                        // 检查域名部分（第一个斜杠之前）
+                        const domainPart = withoutProtocol.split('/')[0];
+                        
+                        // 基本的域名格式检查：包含点，且不为空
+                        return domainPart.length > 0 && domainPart.includes('.');
                     } catch (_) {
                         return false;
                     }
