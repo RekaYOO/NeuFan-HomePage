@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <!--It's MYGO！！！！！-->
+<script defer src="https://umami.neu.fan/script.js" data-website-id="a9126f06-b6ac-48e5-8c43-213b9395aafb"></script>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -926,28 +927,36 @@
                     "url": "https://chatgpt.com"
                 },
                 {
+                    "name": "Claude",
+                    "url": "https://claude.ai"
+                },
+                {
                     "name": "Qwen",
                     "url": "https://chat.qwen.ai/"
                 },
                 {
-                    "name": "Claude",
-                    "url": "https://claude.ai"
+                    "name": "千问",
+                    "url": "https://www.qianwen.com/"
+                },
+                {
+                    "name": "GLM",
+                    "url": "https://chat.z.ai/"
                 },
                 {
                     "name": "智谱",
                     "url": "https://chatglm.cn/main?lang=zh"
                 },
                 {
+                    "name": "MiniMax",
+                    "url": "https://chat.minimaxi.com/"
+                },
+                {
                     "name": "豆包",
                     "url": "https://www.doubao.com/chat/"
                 },
                 {
-                    "name": "通义",
-                    "url": "https://www.tongyi.com/qianwen/"
-                },
-                {
-                    "name": "MiniMax",
-                    "url": "https://chat.minimaxi.com/"
+                    "name": "Kimi",
+                    "url": "https://www.kimi.com/zh/"
                 }
             ]
         },
@@ -968,6 +977,35 @@
                     "url": "https://www.paper2gal.top"
                 }
             ]
+        },
+        {
+            "name": "工作台",
+            "links": [
+                {
+                    "name": "百炼",
+                    "url": "https://bailian.console.aliyun.com/cn-beijing/?tab=app#/app-market/suggest"
+                },
+                {
+                    "name": "月之暗面",
+                    "url": "https://platform.moonshot.cn/playground"
+                },
+                {
+                    "name": "硅基流动（off）",
+                    "url": "https://cloud.siliconflow.cn/i/y9qofYUb"
+                },
+                {
+                    "name": "AI Studio",
+                    "url": "https://aistudio.google.com/"
+                },
+                {
+                    "name": "Happy API",
+                    "url": "https://happyapi.org/register?aff=xtJm"
+                },
+                {
+                    "name": "Openrouter",
+                    "url": "https://openrouter.ai/"
+                }
+            ]
         }
     ],
     "academic": [
@@ -975,24 +1013,32 @@
             "name": "通用检索",
             "links": [
                 {
+                    "name": "CSSCI",
+                    "url": "https://cssci.nju.edu.cn/"
+                },
+                {
                     "name": "Scopus",
                     "url": "https://www.scopus.com"
                 },
                 {
-                    "name": "CSSCI",
-                    "url": "https://cssci.nju.edu.cn/"
+                    "name": "WOF",
+                    "url": "https://www.webofscience.com"
                 },
                 {
                     "name": "知网",
                     "url": "http://www.cnki.net"
                 },
                 {
+                    "name": "NEU学术搜索",
+                    "url": "https://neu.bohrium.com/"
+                },
+                {
                     "name": "谷歌学术",
                     "url": "https://scholar.google.com"
                 },
                 {
-                    "name": "波尔学术",
-                    "url": "https://neu.bohrium.com/"
+                    "name": "万方数据资源系统",
+                    "url": "https://w.wanfangdata.com.cn"
                 }
             ]
         },
@@ -1000,8 +1046,40 @@
             "name": "官方数据库",
             "links": [
                 {
-                    "name": "WOF",
-                    "url": "https://www.webofscience.com"
+                    "name": "ACM",
+                    "url": "https://dl.acm.org/"
+                },
+                {
+                    "name": "ACS",
+                    "url": "http://pubs.acs.org"
+                },
+                {
+                    "name": "ASM",
+                    "url": "https://asm.mpds.io/#start"
+                },
+                {
+                    "name": "AIP",
+                    "url": "https://pubs.aip.org/"
+                },
+                {
+                    "name": "APS",
+                    "url": "http://journals.aps.org/"
+                },
+                {
+                    "name": "CJO",
+                    "url": "https://www.cambridge.org/core"
+                },
+                {
+                    "name": "EBSCO",
+                    "url": "https://search.ebscohost.com/ "
+                },
+                {
+                    "name": "INFORMS-OL",
+                    "url": "https://pubsonline.informs.org/"
+                },
+                {
+                    "name": "IEL",
+                    "url": "https://ieeexplore.ieee.org/ "
                 },
                 {
                     "name": "Springer",
@@ -1014,26 +1092,6 @@
                 {
                     "name": "Wiley",
                     "url": "https://onlinelibrary.wiley.com/"
-                },
-                {
-                    "name": "INFORMS-OL",
-                    "url": "https://pubsonline.informs.org/"
-                },
-                {
-                    "name": "BSC",
-                    "url": "https://search.ebscohost.com/ "
-                },
-                {
-                    "name": "ASP",
-                    "url": "https://search.ebscohost.com/ "
-                },
-                {
-                    "name": "ACM",
-                    "url": "https://dl.acm.org/"
-                },
-                {
-                    "name": "CJO",
-                    "url": "https://www.cambridge.org/core"
                 }
             ]
         },
@@ -1117,9 +1175,18 @@
                 // 检查输入是否为有效的URL
                 const isValidUrl = (string) => {
                     try {
-                        // 检查是否包含域名格式
-                        const urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/i;
-                        return urlPattern.test(string) || string.includes('.');
+                        // 简化的URL检测，避免正则表达式灾难性回溯
+                        // 检查是否包含域名格式（至少有一个点，且不全是数字）
+                        if (!string.includes('.')) return false;
+                        
+                        // 移除协议前缀
+                        const withoutProtocol = string.replace(/^https?:\/\//, '');
+                        
+                        // 检查域名部分（第一个斜杠之前）
+                        const domainPart = withoutProtocol.split('/')[0];
+                        
+                        // 基本的域名格式检查：包含点，且不为空
+                        return domainPart.length > 0 && domainPart.includes('.');
                     } catch (_) {
                         return false;
                     }
