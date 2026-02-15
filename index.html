@@ -287,16 +287,10 @@
             <h1><a href="https://neu.edu.cn">NEU</a>FAN-不再迷途</h1>
             <div style="display: flex; justify-content: center; align-items: center; flex-wrap: wrap;">
                 <input type="text" v-model="searchQuery" placeholder="搜索网站..." />
-                <button v-if="!isVpnDirectMode" 
-                        class="webvpn-button" 
+                <button class="webvpn-button" 
                         :class="'mode-' + webvpnMode"
                         @click="toggleWebVPN">
                     {{ webvpnButtonText }}
-                </button>
-                <button v-if="isVpnDirectMode"
-                        class="webvpn-button active"
-                        @click="handleVpnDirectJump">
-                    Go
                 </button>
             </div>
             <div class="nav-buttons">
@@ -525,15 +519,6 @@
                     // 处理直接跳转
                     if (originalUrl.startsWith('vpn ')) {
                         event.preventDefault();
-                        const input = originalUrl.slice(4);
-                        const { domain, port } = parseUrl('http://' + input);
-                        try {
-                            const encryptedUrl = await encryptUrlBrowser(domain, 'http', port);
-                            window.location.href = encryptedUrl;
-                        } catch (error) {
-                            console.error('跳转失败:', error);
-                            alert('此地址无法从校内访问，请检查地址正确性');
-                        }
                         return;
                     }
 
@@ -1115,36 +1100,6 @@
     ]
 });
 
-                // 检查是否是直接跳转模式
-                const isVpnDirectMode = computed(() => {
-                    return searchQuery.value.trim().toLowerCase().startsWith('vpn ');
-                });
-
-                // 获取跳转域名
-                const vpnDirectDomain = computed(() => {
-                    if (isVpnDirectMode.value) {
-                        return searchQuery.value.slice(4).trim();
-                    }
-                    return '';
-                });
-
-                // 处理直接跳转
-                const handleVpnDirectJump = async () => {
-                    const domain = vpnDirectDomain.value;
-                    if (!domain) {
-                        alert('请输入有效的域名');
-                        return;
-                    }
-                    
-                    try {
-                        const encryptedUrl = await encryptUrlBrowser(domain);
-                        window.location.href = encryptedUrl;
-                    } catch (error) {
-                        console.error('跳转失败:', error);
-                        alert('失败，请检查域名格式');
-                    }
-                };
-
                 // 处理页面切换
                 const handlePageChange = (pageId, withAnimation = false) => {
                     useAnimation.value = withAnimation;
@@ -1195,21 +1150,6 @@
                 // 根据当前页面和搜索条件过滤书签
                 const filteredCategories = computed(() => {
                     const query = searchQuery.value.trim();
-
-                    // 检查是否是直接跳转命令
-                    if (query.toLowerCase().startsWith('vpn ')) {
-                        const domain = query.slice(4).trim();
-                        if (domain) {
-                            return [{
-                                name: '校内访问',
-                                links: [{
-                                    name: `跳转到 ${domain}`,
-                                    url: `vpn ${domain}`,
-                                    isVpnDirect: true
-                                }]
-                            }];
-                        }
-                    }
 
                     // 检查域名是否存在于学术板块
                     const checkAcademicDomain = (url) => {
@@ -1287,7 +1227,7 @@
                                 allResults.push({
                                     name: '此数据库支持校园网免费访问',
                                     links: [{
-                                        name: webvpnMode.value > 0 ? `访问 ${truncateText(query)}` : '请打开校内模式',
+                                        name: webvpnMode.value > 0 ? `访问 ${truncateText(query)}` : '请点击“直连模式”以打开校内模式',
                                         url: processedUrl,
                                         isDirectAccess: true,
                                         isAcademicAccess: true,
@@ -1296,7 +1236,7 @@
                                 });
                             } else {
                                 allResults.push({
-                                    name: '直接访问',
+                                    name: webvpnMode.value > 0 ? '校内访问' : '直接访问',
                                     links: [{
                                         name: `访问 ${truncateText(query)}`,
                                         url: processedUrl,
@@ -1334,10 +1274,7 @@
                     toggleWebVPN,
                     webvpnButtonText,
                     getProcessedUrl,
-                    handleLinkClick,
-                    isVpnDirectMode,
-                    vpnDirectDomain,
-                    handleVpnDirectJump
+                    handleLinkClick
                 };
             }
         }).mount('#app');

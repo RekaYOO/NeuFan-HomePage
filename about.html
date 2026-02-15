@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>关于 - NEUFAN</title>
+    <link rel="icon" type="image/jpg" href="./icon.jpg">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: #4CAF50;
+            padding: 40px 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        header h1 a {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .back-button {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 25px;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 25px;
+            transition: all 0.3s;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .back-button:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        main {
+            flex: 1;
+            padding: 40px 20px;
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .feature-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #4CAF50;
+            transition: all 0.3s;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .feature-card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .feature-card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .feature-card:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature-card h2 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: #4CAF50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            display: inline-block;
+            animation: bounce 2s infinite;
+        }
+
+        .feature-card p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #555;
+        }
+
+        .feature-card ul {
+            margin-top: 15px;
+            padding-left: 20px;
+        }
+
+        .feature-card li {
+            margin-bottom: 10px;
+            line-height: 1.6;
+            color: #666;
+        }
+
+        .feature-card li strong {
+            color: #333;
+        }
+
+        .opensource-section {
+            text-align: center;
+        }
+
+        .github-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+            padding: 15px 30px;
+            background-color: #24292e;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .github-link:hover {
+            background-color: #2f363d;
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .github-icon {
+            width: 24px;
+            height: 24px;
+        }
+
+        footer {
+            background-color: rgba(51, 51, 51, 0.9);
+            color: #fff;
+            text-align: center;
+            padding: 15px;
+            font-size: 0.9rem;
+        }
+
+        footer a {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2rem;
+            }
+
+            .feature-card {
+                padding: 20px;
+            }
+
+            .feature-card h2 {
+                font-size: 1.5rem;
+            }
+
+            .feature-card p {
+                font-size: 1rem;
+            }
+
+            main {
+                padding: 20px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1><a href="index.html">NEUFAN</a> - 功能介绍</h1>
+        <a href="index.html" class="back-button">← 返回首页</a>
+    </header>
+
+    <main>
+        <div class="feature-card">
+            <h2><span class="feature-icon">🔍</span>全局搜索</h2>
+            <p>强大的智能搜索功能，让你快速找到所需资源：</p>
+            <ul>
+                <li><strong>本站搜索：</strong>支持根据网址、名称搜索本站收录的所有网页，快速定位你需要的资源</li>
+                <li><strong>智能识别：</strong>支持输入学校已购数据库内期刊链接，系统自动识别并匹配，使用 WebVPN 访问</li>
+                <li><strong>直接访问：</strong>支持输入未收录链接后使用 WebVPN 访问，无需手动配置</li>
+            </ul>
+            <p style="margin-top: 20px; padding: 15px; background: #f1f8f4; border-radius: 10px; border-left: 4px solid #4CAF50;">
+                <strong>💡 操作方法：</strong><br>
+                ① 在搜索栏输入链接<br>
+                ② 点击"直连模式"按钮切换到"校内模式"或"备用模式"<br>
+                ③ 点击下方自动生成的"直接访问"按钮，即可通过 WebVPN 访问该链接
+            </p>
+        </div>
+
+        <div class="feature-card">
+            <h2><span class="feature-icon">🌐</span>全局 WebVPN 支持</h2>
+            <p>一键开启校内访问模式，畅享校园网资源：</p>
+            <ul>
+                <li><strong>一键切换：</strong>点击"启动校内模式"或"备用模式"按钮，本站内所有链接自动转换为 WebVPN 链接</li>
+                <li><strong>校内 IP：</strong>直接访问即为校内 IP，无需额外配置</li>
+                <li><strong>广泛支持：</strong>有效支持仅校内访问的服务以及学术期刊的机构 IP 登录</li>
+                <li><strong>配合搜索：</strong>可与搜索栏配合使用，实现智能访问</li>
+            </ul>
+        </div>
+
+        <div class="feature-card opensource-section">
+            <h2><span class="feature-icon">💻</span>开源项目</h2>
+            <p>本项目已在 GitHub 开源，欢迎查看源码、提出建议或参与贡献！</p>
+            <a href="https://github.com/RekaYOO/NeuFan-HomePage" target="_blank" class="github-link">
+                <svg class="github-icon" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+                </svg>
+                访问 GitHub 仓库
+            </a>
+        </div>
+    </main>
+
+    <footer>
+        <a href="https://beian.miit.gov.cn" target="_blank">滇ICP备2025051314号</a>
+    </footer>
+</body>
+</html>
+

@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>书签编辑器 - NEUFAN</title>
+    <link rel="icon" type="image/jpg" href="./icon.jpg">
+    <script src="https://unpkg.com/vue@3.2.31/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            min-height: 100vh;
+        }
+
+        .top-bar {
+            background-color: #4CAF50;
+            color: #fff;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            gap: 20px;
+        }
+
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .top-bar h1 {
+            font-size: 1.5rem;
+            margin: 0;
+        }
+
+        .file-selector-inline {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .file-selector-inline input[type="file"] {
+            display: none;
+        }
+
+        .file-selector-inline label {
+            padding: 8px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+
+        .file-selector-inline label:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .file-name-display {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.9rem;
+        }
+
+        .back-link {
+            padding: 8px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 20px;
+            transition: all 0.3s;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+
+        .back-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .file-selector {
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            animation: slideDown 0.3s ease-out;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-left: 4px solid #17a2b8;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 30px;
+        }
+
+        .sidebar {
+            /* 移除 sticky 定位，让侧边栏正常滚动 */
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .card h2 {
+            color: #4CAF50;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .form-group input[list] {
+            cursor: text;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: #4CAF50;
+            color: #fff;
+            width: 100%;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn-secondary {
+            background: #2196F3;
+            color: #fff;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: #0b7dda;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+        }
+
+        .btn-danger {
+            background: #f44336;
+            color: #fff;
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            background: #da190b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .button-group .btn {
+            flex: 1;
+        }
+
+        .page-selector {
+            margin-bottom: 20px;
+        }
+
+        .page-tabs {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .page-tab {
+            padding: 10px 20px;
+            background: #f0f0f0;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            color: #666;
+        }
+
+        .page-tab:hover {
+            background: #e0e0e0;
+        }
+
+        .page-tab.active {
+            background: #4CAF50;
+            color: #fff;
+            border-color: #4CAF50;
+        }
+
+        .bookmark-list {
+            min-height: 200px;
+        }
+
+        .category-group {
+            margin-bottom: 30px;
+        }
+
+        .category-header {
+            background: #f5f5f5;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #4CAF50;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            user-select: none;
+        }
+
+        .category-header:hover {
+            background: #e8f5e9;
+        }
+
+        .category-header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .category-toggle {
+            font-size: 1.2rem;
+            transition: transform 0.3s;
+        }
+
+        .category-toggle.collapsed {
+            transform: rotate(-90deg);
+        }
+
+        .category-count {
+            background: #4CAF50;
+            color: #fff;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+        }
+
+        .category-content {
+            overflow: visible;
+            transition: all 0.3s ease-out;
+        }
+
+        .category-content.collapsed {
+            max-height: 0 !important;
+            opacity: 0;
+            overflow: hidden;
+        }
+
+        .bookmark-item {
+            background: #fff;
+            padding: 15px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s;
+            cursor: move;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .bookmark-item:hover {
+            border-color: #4CAF50;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .bookmark-item.dragging {
+            opacity: 0.5;
+            transform: scale(0.95);
+        }
+
+        .bookmark-item.selected {
+            border-color: #4CAF50;
+            background: #f1f8f4;
+            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.2);
+        }
+
+        .bookmark-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .bookmark-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .drag-handle {
+            color: #999;
+            cursor: move;
+            font-size: 1.2rem;
+        }
+
+        .bookmark-url {
+            color: #666;
+            font-size: 0.9rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .bookmark-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-icon {
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            min-width: auto;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .empty-state h3 {
+            margin-bottom: 10px;
+            color: #666;
+        }
+
+        .save-section {
+            background: #fff;
+            padding: 15px;
+            border-top: 2px solid #e0e0e0;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .save-section .btn {
+            padding: 12px 40px;
+            font-size: 1rem;
+        }
+
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .page-tabs {
+                flex-direction: column;
+            }
+
+            .page-tab {
+                width: 100%;
+                text-align: center;
+            }
+
+            .bookmark-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .bookmark-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+        }
+
+        .sortable-ghost {
+            opacity: 0.4;
+            background: #c8e6c9;
+        }
+
+        .edit-mode-indicator {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            color: #856404;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="top-bar">
+            <div class="top-bar-left">
+                <h1>📚 书签编辑器</h1>
+                <div class="file-selector-inline">
+                    <input type="file" id="fileInput" @change="loadFile" accept=".html" />
+                    <label for="fileInput">📁 选择文件</label>
+                    <span class="file-name-display" v-if="fileName">{{ fileName }}</span>
+                </div>
+            </div>
+            <a href="index.html" class="back-link">← 返回首页</a>
+        </div>
+
+        <div class="container">
+
+            <!-- 提示信息 -->
+            <div v-if="alert.show" :class="'alert alert-' + alert.type">
+                <span v-if="alert.type === 'success'">✓</span>
+                <span v-if="alert.type === 'error'">✗</span>
+                <span v-if="alert.type === 'info'">ℹ</span>
+                {{ alert.message }}
+            </div>
+
+            <div v-if="bookmarks">
+                <div class="main-grid">
+                    <!-- 左侧边栏 -->
+                    <div class="sidebar">
+                        <!-- 添加书签 -->
+                        <div class="card">
+                            <h2>➕ 添加书签</h2>
+                            <div class="form-group">
+                                <label>页面</label>
+                                <input list="page-list" v-model="newBookmark.page" placeholder="选择或输入新页面" />
+                                <datalist id="page-list">
+                                    <option v-for="page in pages" :key="page" :value="page">{{ page }}</option>
+                                </datalist>
+                            </div>
+                            <div class="form-group">
+                                <label>类别</label>
+                                <input list="category-list" v-model="newBookmark.category" placeholder="选择或输入新类别" @keyup.enter="addBookmark" />
+                                <datalist id="category-list">
+                                    <option v-for="cat in currentCategories" :key="cat" :value="cat">{{ cat }}</option>
+                                </datalist>
+                            </div>
+                            <div class="form-group">
+                                <label>名称</label>
+                                <input v-model="newBookmark.name" placeholder="输入书签名称" @keyup.enter="addBookmark" />
+                            </div>
+                            <div class="form-group">
+                                <label>URL</label>
+                                <input v-model="newBookmark.url" placeholder="输入网址" @keyup.enter="addBookmark" />
+                            </div>
+                            <button class="btn btn-primary" @click="addBookmark">添加书签</button>
+                        </div>
+
+                        <!-- 编辑书签 -->
+                        <div class="card" v-if="selectedBookmark" ref="editCard">
+                            <div class="edit-mode-indicator">
+                                ✏️ 编辑模式
+                            </div>
+                            <h2>编辑书签</h2>
+                            <div class="form-group">
+                                <label>类别</label>
+                                <input list="edit-category-list" v-model="editBookmark.category" @keyup.enter="saveEdit" />
+                                <datalist id="edit-category-list">
+                                    <option v-for="cat in allCategories" :key="cat" :value="cat">{{ cat }}</option>
+                                </datalist>
+                            </div>
+                            <div class="form-group">
+                                <label>名称</label>
+                                <input v-model="editBookmark.name" @keyup.enter="saveEdit" />
+                            </div>
+                            <div class="form-group">
+                                <label>URL</label>
+                                <input v-model="editBookmark.url" @keyup.enter="saveEdit" />
+                            </div>
+                            <div class="button-group">
+                                <button class="btn btn-secondary" @click="saveEdit">保存</button>
+                                <button class="btn btn-danger" @click="cancelEdit">取消</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 右侧主内容 -->
+                    <div>
+                        <div class="card">
+                            <h2>📋 书签列表</h2>
+                            
+                            <!-- 页面选择器 -->
+                            <div class="page-selector">
+                                <div class="page-tabs">
+                                    <div v-for="page in pages" 
+                                         :key="page"
+                                         :class="['page-tab', { active: currentPage === page }]"
+                                         @click="currentPage = page">
+                                        {{ page }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 书签列表 -->
+                            <div class="bookmark-list">
+                                <div v-if="groupedBookmarks.length === 0" class="empty-state">
+                                    <svg viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M19,2L14,6.5V17.5L19,13V2M6.5,5C4.55,5 2.45,5.4 1,6.5V21.16C1,21.41 1.25,21.66 1.5,21.66C1.6,21.66 1.65,21.59 1.75,21.59C3.1,20.94 5.05,20.5 6.5,20.5C8.45,20.5 10.55,20.9 12,22C13.35,21.15 15.8,20.5 17.5,20.5C19.15,20.5 20.85,20.81 22.25,21.56C22.35,21.61 22.4,21.59 22.5,21.59C22.75,21.59 23,21.34 23,21.09V6.5C22.4,6.05 21.75,5.75 21,5.5V7.5L21,13V19C19.9,18.65 18.7,18.5 17.5,18.5C15.8,18.5 13.35,19.15 12,20V13L12,8.5V6.5C10.55,5.4 8.45,5 6.5,5Z" />
+                                    </svg>
+                                    <h3>暂无书签</h3>
+                                    <p>在左侧添加新书签</p>
+                                </div>
+
+                                <div v-for="group in groupedBookmarks" :key="group.category" class="category-group">
+                                    <div class="category-header" @click="toggleCategory(group.category)">
+                                        <div class="category-header-left">
+                                            <span class="category-toggle" :class="{ collapsed: collapsedCategories[group.category] }">▼</span>
+                                            <span>{{ group.category }}</span>
+                                        </div>
+                                        <span class="category-count">{{ group.items.length }}</span>
+                                    </div>
+                                    <div class="category-content" 
+                                         :class="{ collapsed: collapsedCategories[group.category] }">
+                                        <div :ref="el => setCategoryRef(group.category, el)">
+                                            <div v-for="(item, index) in group.items" 
+                                                 :key="item.url"
+                                                 :class="['bookmark-item', { selected: selectedBookmark === item }]"
+                                                 :data-category="group.category"
+                                                 :data-index="index"
+                                                 @click="selectBookmark(item)">
+                                                <div class="bookmark-info">
+                                                    <div class="bookmark-name">
+                                                        <span class="drag-handle">⋮⋮</span>
+                                                        {{ item.name }}
+                                                    </div>
+                                                    <div class="bookmark-url">{{ item.url }}</div>
+                                                </div>
+                                                <div class="bookmark-actions">
+                                                    <button class="btn btn-secondary btn-icon" 
+                                                            @click.stop="selectBookmark(item)"
+                                                            title="编辑">
+                                                        ✏️
+                                                    </button>
+                                                    <button class="btn btn-danger btn-icon" 
+                                                            @click.stop="deleteBookmark(item)"
+                                                            title="删除">
+                                                        🗑️
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 保存按钮 -->
+                        <div class="save-section">
+                            <button class="btn btn-primary" @click="handleSave">
+                                💾 保存文件
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div v-else class="empty-state" style="padding: 80px 20px;">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
+                </svg>
+                <h3>请选择一个 HTML 文件开始编辑</h3>
+                <p>点击上方按钮选择 index.html 文件</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp, ref, computed, onMounted, nextTick, watch } = Vue;
+
+        createApp({
+            setup() {
+                const fileName = ref('');
+                const fileContent = ref('');
+                const bookmarks = ref(null);
+                const currentPage = ref('quick');
+                const selectedBookmark = ref(null);
+                const alert = ref({ show: false, type: 'info', message: '' });
+                const categoryRefs = ref({});
+                const sortableInstances = ref({});
+                const editCard = ref(null);
+                const collapsedCategories = ref({});
+                const originalFile = ref(null);
+
+                const newBookmark = ref({
+                    page: 'quick',
+                    category: '',
+                    name: '',
+                    url: ''
+                });
+
+                const editBookmark = ref({
+                    category: '',
+                    name: '',
+                    url: ''
+                });
+
+                const pages = computed(() => {
+                    return bookmarks.value ? Object.keys(bookmarks.value) : [];
+                });
+
+                const currentCategories = computed(() => {
+                    if (!bookmarks.value || !newBookmark.value.page) return [];
+                    const pageData = bookmarks.value[newBookmark.value.page];
+                    if (!pageData) return [];
+                    return pageData.map(cat => cat.name);
+                });
+
+                const allCategories = computed(() => {
+                    if (!bookmarks.value) return [];
+                    const categories = new Set();
+                    Object.values(bookmarks.value).forEach(pageData => {
+                        pageData.forEach(cat => {
+                            categories.add(cat.name);
+                        });
+                    });
+                    return Array.from(categories);
+                });
+
+                const groupedBookmarks = computed(() => {
+                    if (!bookmarks.value || !currentPage.value) return [];
+                    
+                    const pageData = bookmarks.value[currentPage.value];
+                    if (!pageData) return [];
+
+                    return pageData.map(category => ({
+                        category: category.name,
+                        items: category.links.map(link => ({
+                            page: currentPage.value,
+                            category: category.name,
+                            name: link.name,
+                            url: link.url
+                        }))
+                    }));
+                });
+
+                const setCategoryRef = (category, el) => {
+                    if (el) {
+                        categoryRefs.value[category] = el;
+                    }
+                };
+
+                const initSortable = () => {
+                    // 清理旧的实例
+                    Object.values(sortableInstances.value).forEach(instance => {
+                        if (instance) instance.destroy();
+                    });
+                    sortableInstances.value = {};
+
+                    // 为每个类别创建拖拽实例
+                    nextTick(() => {
+                        Object.entries(categoryRefs.value).forEach(([category, el]) => {
+                            if (el && typeof Sortable !== 'undefined') {
+                                sortableInstances.value[category] = Sortable.create(el, {
+                                    animation: 150,
+                                    ghostClass: 'sortable-ghost',
+                                    handle: '.drag-handle',
+                                    onEnd: (evt) => {
+                                        const { oldIndex, newIndex } = evt;
+                                        if (oldIndex === newIndex) return;
+
+                                        const page = currentPage.value;
+                                        const cat = bookmarks.value[page].find(c => c.name === category);
+                                        
+                                        if (cat) {
+                                            const item = cat.links.splice(oldIndex, 1)[0];
+                                            cat.links.splice(newIndex, 0, item);
+                                            showAlert('success', '顺序已更新');
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                    });
+                };
+
+                watch([currentPage, bookmarks], () => {
+                    nextTick(() => {
+                        initSortable();
+                        // 初始化折叠状态 - 默认全部折叠
+                        if (bookmarks.value && currentPage.value) {
+                            const pageData = bookmarks.value[currentPage.value];
+                            if (pageData) {
+                                pageData.forEach(cat => {
+                                    if (!(cat.name in collapsedCategories.value)) {
+                                        collapsedCategories.value[cat.name] = true;
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }, { deep: true });
+
+                const showAlert = (type, message) => {
+                    alert.value = { show: true, type, message };
+                    setTimeout(() => {
+                        alert.value.show = false;
+                    }, 3000);
+                };
+
+                const loadFile = (event) => {
+                    const file = event.target.files[0];
+                    if (!file) return;
+
+                    originalFile.value = file;
+                    fileName.value = file.name;
+                    const reader = new FileReader();
+                    
+                    reader.onload = (e) => {
+                        fileContent.value = e.target.result;
+                        try {
+                            const pattern = /const bookmarks = ref\(({[\s\S]*?})\);/;
+                            const match = fileContent.value.match(pattern);
+                            
+                            if (match) {
+                                bookmarks.value = JSON.parse(match[1]);
+                                showAlert('success', '文件加载成功！');
+                                nextTick(() => {
+                                    initSortable();
+                                });
+                            } else {
+                                showAlert('error', '未找到书签数据');
+                            }
+                        } catch (error) {
+                            showAlert('error', '解析文件失败: ' + error.message);
+                        }
+                    };
+                    
+                    reader.readAsText(file);
+                };
+
+                const addBookmark = () => {
+                    if (!newBookmark.value.page || !newBookmark.value.category || 
+                        !newBookmark.value.name || !newBookmark.value.url) {
+                        showAlert('error', '请填写完整信息');
+                        return;
+                    }
+
+                    const page = newBookmark.value.page;
+                    const categoryName = newBookmark.value.category;
+
+                    if (!bookmarks.value[page]) {
+                        bookmarks.value[page] = [];
+                    }
+
+                    let category = bookmarks.value[page].find(cat => cat.name === categoryName);
+                    if (!category) {
+                        category = { name: categoryName, links: [] };
+                        bookmarks.value[page].push(category);
+                    }
+
+                    category.links.push({
+                        name: newBookmark.value.name,
+                        url: newBookmark.value.url
+                    });
+
+                    showAlert('success', '书签添加成功！');
+                    newBookmark.value.name = '';
+                    newBookmark.value.url = '';
+                    
+                    // 切换到添加的页面
+                    currentPage.value = page;
+                };
+
+                const selectBookmark = (item) => {
+                    if (selectedBookmark.value === item) {
+                        selectedBookmark.value = null;
+                        return;
+                    }
+                    selectedBookmark.value = item;
+                    editBookmark.value = {
+                        category: item.category,
+                        name: item.name,
+                        url: item.url
+                    };
+                    
+                    // 滚动到编辑区域
+                    nextTick(() => {
+                        if (editCard.value) {
+                            editCard.value.scrollIntoView({ 
+                                behavior: 'smooth', 
+                                block: 'start'
+                            });
+                        }
+                    });
+                };
+
+                const saveEdit = () => {
+                    if (!selectedBookmark.value) return;
+
+                    if (!editBookmark.value.category || !editBookmark.value.name || !editBookmark.value.url) {
+                        showAlert('error', '请填写完整信息');
+                        return;
+                    }
+
+                    const page = selectedBookmark.value.page;
+                    const oldCategory = selectedBookmark.value.category;
+                    const oldName = selectedBookmark.value.name;
+                    const oldUrl = selectedBookmark.value.url;
+
+                    // 删除旧书签
+                    const oldCat = bookmarks.value[page].find(cat => cat.name === oldCategory);
+                    if (oldCat) {
+                        const index = oldCat.links.findIndex(link => 
+                            link.name === oldName && link.url === oldUrl
+                        );
+                        if (index !== -1) {
+                            oldCat.links.splice(index, 1);
+                        }
+                        if (oldCat.links.length === 0) {
+                            bookmarks.value[page] = bookmarks.value[page].filter(cat => cat.name !== oldCategory);
+                        }
+                    }
+
+                    // 添加新书签
+                    let newCat = bookmarks.value[page].find(cat => cat.name === editBookmark.value.category);
+                    if (!newCat) {
+                        newCat = { name: editBookmark.value.category, links: [] };
+                        bookmarks.value[page].push(newCat);
+                    }
+
+                    newCat.links.push({
+                        name: editBookmark.value.name,
+                        url: editBookmark.value.url
+                    });
+
+                    showAlert('success', '书签修改成功！');
+                    selectedBookmark.value = null;
+                };
+
+                const cancelEdit = () => {
+                    selectedBookmark.value = null;
+                };
+
+                const deleteBookmark = (item) => {
+                    if (!confirm('确定要删除这个书签吗？')) return;
+
+                    const page = item.page;
+                    const category = bookmarks.value[page].find(cat => cat.name === item.category);
+                    
+                    if (category) {
+                        category.links = category.links.filter(link => 
+                            !(link.name === item.name && link.url === item.url)
+                        );
+                        
+                        if (category.links.length === 0) {
+                            bookmarks.value[page] = bookmarks.value[page].filter(cat => cat.name !== item.category);
+                        }
+                    }
+
+                    showAlert('success', '书签删除成功！');
+                    if (selectedBookmark.value === item) {
+                        selectedBookmark.value = null;
+                    }
+                };
+
+                const toggleCategory = (category) => {
+                    collapsedCategories.value[category] = !collapsedCategories.value[category];
+                };
+
+                const handleSave = async () => {
+                    if (!bookmarks.value || !fileContent.value) {
+                        showAlert('error', '没有可保存的数据');
+                        return;
+                    }
+
+                    try {
+                        const pattern = /const bookmarks = ref\(({[\s\S]*?})\);/;
+                        const newJson = JSON.stringify(bookmarks.value, null, 4);
+                        const newContent = fileContent.value.replace(pattern, `const bookmarks = ref(${newJson});`);
+
+                        // 优先尝试直接覆盖
+                        if ('showSaveFilePicker' in window && originalFile.value) {
+                            try {
+                                const options = {
+                                    suggestedName: fileName.value,
+                                    types: [{
+                                        description: 'HTML Files',
+                                        accept: { 'text/html': ['.html'] }
+                                    }]
+                                };
+                                
+                                const handle = await window.showSaveFilePicker(options);
+                                const writable = await handle.createWritable();
+                                await writable.write(newContent);
+                                await writable.close();
+                                
+                                showAlert('success', '文件已保存！');
+                                return;
+                            } catch (error) {
+                                if (error.name === 'AbortError') {
+                                    showAlert('info', '保存已取消');
+                                    return;
+                                }
+                                // 如果直接覆盖失败，继续执行下载
+                            }
+                        }
+
+                        // 降级方案：下载文件
+                        const blob = new Blob([newContent], { type: 'text/html' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = fileName.value || 'index.html';
+                        a.click();
+                        URL.revokeObjectURL(url);
+
+                        showAlert('success', '文件已下载！');
+                    } catch (error) {
+                        showAlert('error', '保存失败: ' + error.message);
+                    }
+                };
+
+                const saveToFile = () => {
+                    if (!bookmarks.value || !fileContent.value) {
+                        showAlert('error', '没有可保存的数据');
+                        return;
+                    }
+
+                    try {
+                        const pattern = /const bookmarks = ref\(({[\s\S]*?})\);/;
+                        const newJson = JSON.stringify(bookmarks.value, null, 4);
+                        const newContent = fileContent.value.replace(pattern, `const bookmarks = ref(${newJson});`);
+
+                        const blob = new Blob([newContent], { type: 'text/html' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = fileName.value || 'index.html';
+                        a.click();
+                        URL.revokeObjectURL(url);
+
+                        showAlert('success', '文件下载成功！');
+                    } catch (error) {
+                        showAlert('error', '保存失败: ' + error.message);
+                    }
+                };
+
+                const saveDirectly = async () => {
+                    if (!bookmarks.value || !fileContent.value || !originalFile.value) {
+                        showAlert('error', '没有可保存的数据或未加载文件');
+                        return;
+                    }
+
+                    try {
+                        const pattern = /const bookmarks = ref\(({[\s\S]*?})\);/;
+                        const newJson = JSON.stringify(bookmarks.value, null, 4);
+                        const newContent = fileContent.value.replace(pattern, `const bookmarks = ref(${newJson});`);
+
+                        // 使用 File System Access API 直接覆盖文件
+                        if ('showSaveFilePicker' in window) {
+                            const options = {
+                                suggestedName: fileName.value,
+                                types: [{
+                                    description: 'HTML Files',
+                                    accept: { 'text/html': ['.html'] }
+                                }]
+                            };
+                            
+                            const handle = await window.showSaveFilePicker(options);
+                            const writable = await handle.createWritable();
+                            await writable.write(newContent);
+                            await writable.close();
+                            
+                            showAlert('success', '文件已直接覆盖保存！');
+                        } else {
+                            // 降级方案：下载文件
+                            showAlert('info', '浏览器不支持直接覆盖，将下载文件');
+                            saveToFile();
+                        }
+                    } catch (error) {
+                        if (error.name === 'AbortError') {
+                            showAlert('info', '保存已取消');
+                        } else {
+                            showAlert('error', '保存失败: ' + error.message);
+                        }
+                    }
+                };
+
+                return {
+                    fileName,
+                    bookmarks,
+                    currentPage,
+                    pages,
+                    currentCategories,
+                    allCategories,
+                    groupedBookmarks,
+                    newBookmark,
+                    editBookmark,
+                    selectedBookmark,
+                    alert,
+                    editCard,
+                    collapsedCategories,
+                    loadFile,
+                    addBookmark,
+                    selectBookmark,
+                    saveEdit,
+                    cancelEdit,
+                    deleteBookmark,
+                    toggleCategory,
+                    handleSave,
+                    setCategoryRef
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
+

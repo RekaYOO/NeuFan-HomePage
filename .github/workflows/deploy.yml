@@ -1,9 +1,10 @@
-name: Deploy index.html to Server
+name: Deploy to Server
 
 on:
   push:
     paths:
       - 'index.html'
+      - 'about.html'
     branches:
       - main  # 根据你的默认分支名称修改，可能是 master
 
@@ -25,13 +26,13 @@ jobs:
           script: |
             echo "Starting deployment..."
             
-      - name: Copy file to server
+      - name: Copy files to server
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SERVER_PORT }}
-          source: "index.html"
+          source: "index.html,about.html"
           target: "/opt/1panel/apps/openresty/openresty/www/sites/mygo.neu.fan/index"
           overwrite: true
