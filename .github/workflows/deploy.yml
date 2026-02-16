@@ -34,5 +34,5 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SERVER_PORT }}
           source: "index.html,about.html"
-          target: "/opt/1panel/apps/openresty/openresty/www/sites/mygo.neu.fan/index"
+          target: "/opt/1panel/www/sites/mygo.neu.fan/index"
           overwrite: true
