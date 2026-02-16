@@ -372,6 +372,10 @@
             justify-content: space-between;
             align-items: center;
             gap: 15px;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
         }
 
         .bookmark-item:hover {
@@ -408,6 +412,10 @@
             color: #999;
             cursor: move;
             font-size: 1.2rem;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
         }
 
         .bookmark-url {
@@ -509,8 +517,7 @@
             <div class="top-bar-left">
                 <h1>📚 书签编辑器</h1>
                 <div class="file-selector-inline">
-                    <input type="file" id="fileInput" @change="loadFile" accept=".html" />
-                    <label for="fileInput">📁 选择文件</label>
+                    <button @click="openFileWithHandle" class="btn btn-secondary" style="padding: 10px 20px; margin-right: 10px;">📁 打开文件</button>
                     <span class="file-name-display" v-if="fileName">{{ fileName }}</span>
                 </div>
             </div>
@@ -536,17 +543,28 @@
                             <h2>➕ 添加书签</h2>
                             <div class="form-group">
                                 <label>页面</label>
-                                <input list="page-list" v-model="newBookmark.page" placeholder="选择或输入新页面" />
-                                <datalist id="page-list">
+                                <select v-model="newBookmark.page" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1rem;">
+                                    <option value="">选择页面</option>
                                     <option v-for="page in pages" :key="page" :value="page">{{ page }}</option>
-                                </datalist>
+                                    <option value="__custom__">+ 输入新页面</option>
+                                </select>
+                                <input v-if="newBookmark.page === '__custom__'" 
+                                       v-model="customPage" 
+                                       placeholder="输入新页面名称" 
+                                       style="margin-top: 10px; width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1rem;" />
                             </div>
                             <div class="form-group">
                                 <label>类别</label>
-                                <input list="category-list" v-model="newBookmark.category" placeholder="选择或输入新类别" @keyup.enter="addBookmark" />
-                                <datalist id="category-list">
+                                <select v-model="newBookmark.category" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1rem;">
+                                    <option value="">选择类别</option>
                                     <option v-for="cat in currentCategories" :key="cat" :value="cat">{{ cat }}</option>
-                                </datalist>
+                                    <option value="__custom__">+ 输入新类别</option>
+                                </select>
+                                <input v-if="newBookmark.category === '__custom__'" 
+                                       v-model="customCategory" 
+                                       placeholder="输入新类别名称" 
+                                       @keyup.enter="addBookmark"
+                                       style="margin-top: 10px; width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1rem;" />
                             </div>
                             <div class="form-group">
                                 <label>名称</label>
@@ -567,10 +585,16 @@
                             <h2>编辑书签</h2>
                             <div class="form-group">
                                 <label>类别</label>
-                                <input list="edit-category-list" v-model="editBookmark.category" @keyup.enter="saveEdit" />
-                                <datalist id="edit-category-list">
+                                <select v-model="editBookmark.category" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1rem;">
+                                    <option value="">选择类别</option>
                                     <option v-for="cat in allCategories" :key="cat" :value="cat">{{ cat }}</option>
-                                </datalist>
+                                    <option value="__custom__">+ 输入新类别</option>
+                                </select>
+                                <input v-if="editBookmark.category === '__custom__'" 
+                                       v-model="customEditCategory" 
+                                       placeholder="输入新类别名称" 
+                                       @keyup.enter="saveEdit"
+                                       style="margin-top: 10px; width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1rem;" />
                             </div>
                             <div class="form-group">
                                 <label>名称</label>
@@ -693,6 +717,7 @@
                 const editCard = ref(null);
                 const collapsedCategories = ref({});
                 const originalFile = ref(null);
+                const fileHandle = ref(null); // 保存文件句柄以便直接覆盖
 
                 const newBookmark = ref({
                     page: 'quick',
@@ -700,6 +725,10 @@
                     name: '',
                     url: ''
                 });
+
+                const customPage = ref('');
+                const customCategory = ref('');
+                const customEditCategory = ref('');
 
                 const editBookmark = ref({
                     category: '',
@@ -755,52 +784,95 @@
                 const initSortable = () => {
                     // 清理旧的实例
                     Object.values(sortableInstances.value).forEach(instance => {
-                        if (instance) instance.destroy();
+                        if (instance) {
+                            try {
+                                instance.destroy();
+                            } catch (e) {
+                                console.error('销毁 Sortable 实例失败:', e);
+                            }
+                        }
                     });
                     sortableInstances.value = {};
 
                     // 为每个类别创建拖拽实例
                     nextTick(() => {
-                        Object.entries(categoryRefs.value).forEach(([category, el]) => {
-                            if (el && typeof Sortable !== 'undefined') {
-                                sortableInstances.value[category] = Sortable.create(el, {
-                                    animation: 150,
-                                    ghostClass: 'sortable-ghost',
-                                    handle: '.drag-handle',
-                                    onEnd: (evt) => {
-                                        const { oldIndex, newIndex } = evt;
-                                        if (oldIndex === newIndex) return;
+                        setTimeout(() => {
+                            // 直接通过 DOM 查询获取所有分类容器
+                            const categoryContainers = document.querySelectorAll('.category-content:not(.collapsed) > div');
+                            
+                            categoryContainers.forEach((container) => {
+                                // 从容器中的第一个 bookmark-item 获取分类名称
+                                const firstItem = container.querySelector('.bookmark-item');
+                                if (!firstItem) return;
+                                
+                                const categoryName = firstItem.getAttribute('data-category');
+                                if (!categoryName) return;
 
-                                        const page = currentPage.value;
-                                        const cat = bookmarks.value[page].find(c => c.name === category);
-                                        
-                                        if (cat) {
-                                            const item = cat.links.splice(oldIndex, 1)[0];
-                                            cat.links.splice(newIndex, 0, item);
-                                            showAlert('success', '顺序已更新');
-                                        }
+                                if (typeof Sortable !== 'undefined') {
+                                    try {
+                                        sortableInstances.value[categoryName] = Sortable.create(container, {
+                                            animation: 150,
+                                            ghostClass: 'sortable-ghost',
+                                            handle: '.drag-handle',
+                                            draggable: '.bookmark-item',
+                                            forceFallback: false,
+                                            onStart: (evt) => {
+                                                document.body.style.userSelect = 'none';
+                                                evt.item.style.opacity = '0.5';
+                                            },
+                                            onEnd: (evt) => {
+                                                document.body.style.userSelect = '';
+                                                evt.item.style.opacity = '1';
+                                                
+                                                const { oldIndex, newIndex } = evt;
+                                                if (oldIndex === newIndex) return;
+
+                                                const page = currentPage.value;
+                                                const cat = bookmarks.value[page].find(c => c.name === categoryName);
+                                                
+                                                if (cat && cat.links) {
+                                                    const item = cat.links.splice(oldIndex, 1)[0];
+                                                    cat.links.splice(newIndex, 0, item);
+                                                    showAlert('success', '顺序已更新');
+                                                }
+                                            }
+                                        });
+                                    } catch (e) {
+                                        console.error('创建 Sortable 实例失败:', e);
                                     }
-                                });
-                            }
-                        });
+                                }
+                            });
+                        }, 200);
                     });
                 };
 
-                watch([currentPage, bookmarks], () => {
+                watch(currentPage, () => {
+                    // 初始化折叠状态 - 默认全部展开以便拖动
+                    if (bookmarks.value && currentPage.value) {
+                        const pageData = bookmarks.value[currentPage.value];
+                        if (pageData) {
+                            pageData.forEach(cat => {
+                                if (!(cat.name in collapsedCategories.value)) {
+                                    collapsedCategories.value[cat.name] = false;
+                                }
+                            });
+                        }
+                    }
+                    
                     nextTick(() => {
                         initSortable();
-                        // 初始化折叠状态 - 默认全部折叠
-                        if (bookmarks.value && currentPage.value) {
-                            const pageData = bookmarks.value[currentPage.value];
-                            if (pageData) {
-                                pageData.forEach(cat => {
-                                    if (!(cat.name in collapsedCategories.value)) {
-                                        collapsedCategories.value[cat.name] = true;
-                                    }
-                                });
-                            }
-                        }
                     });
+                });
+
+                // 只在添加/删除书签时重新初始化拖动
+                let sortableInitTimeout = null;
+                watch(bookmarks, () => {
+                    if (sortableInitTimeout) {
+                        clearTimeout(sortableInitTimeout);
+                    }
+                    sortableInitTimeout = setTimeout(() => {
+                        initSortable();
+                    }, 300);
                 }, { deep: true });
 
                 const showAlert = (type, message) => {
@@ -810,46 +882,76 @@
                     }, 3000);
                 };
 
-                const loadFile = (event) => {
-                    const file = event.target.files[0];
-                    if (!file) return;
-
-                    originalFile.value = file;
-                    fileName.value = file.name;
-                    const reader = new FileReader();
-                    
-                    reader.onload = (e) => {
-                        fileContent.value = e.target.result;
-                        try {
-                            const pattern = /const bookmarks = ref\(({[\s\S]*?})\);/;
-                            const match = fileContent.value.match(pattern);
-                            
-                            if (match) {
-                                bookmarks.value = JSON.parse(match[1]);
-                                showAlert('success', '文件加载成功！');
-                                nextTick(() => {
-                                    initSortable();
-                                });
-                            } else {
-                                showAlert('error', '未找到书签数据');
-                            }
-                        } catch (error) {
-                            showAlert('error', '解析文件失败: ' + error.message);
+                const openFileWithHandle = async () => {
+                    try {
+                        if (!('showOpenFilePicker' in window)) {
+                            showAlert('error', '您的浏览器不支持直接文件访问，请使用 Chrome/Edge 最新版本');
+                            return;
                         }
-                    };
-                    
-                    reader.readAsText(file);
+
+                        const [handle] = await window.showOpenFilePicker({
+                            types: [{
+                                description: 'HTML Files',
+                                accept: { 'text/html': ['.html'] }
+                            }],
+                            multiple: false
+                        });
+
+                        fileHandle.value = handle;
+                        fileName.value = handle.name;
+
+                        const file = await handle.getFile();
+                        const content = await file.text();
+                        
+                        fileContent.value = content;
+                        
+                        const pattern = /const bookmarks = ref\(({[\s\S]*?})\);/;
+                        const match = content.match(pattern);
+                        
+                        if (match) {
+                            bookmarks.value = JSON.parse(match[1]);
+                            showAlert('success', '文件加载成功！可以直接保存覆盖');
+                            // 等待 DOM 更新后初始化拖动
+                            setTimeout(() => {
+                                initSortable();
+                            }, 500);
+                        } else {
+                            showAlert('error', '未找到书签数据');
+                        }
+                    } catch (error) {
+                        if (error.name === 'AbortError') {
+                            showAlert('info', '已取消选择文件');
+                        } else {
+                            showAlert('error', '打开文件失败: ' + error.message);
+                        }
+                    }
                 };
 
                 const addBookmark = () => {
-                    if (!newBookmark.value.page || !newBookmark.value.category || 
-                        !newBookmark.value.name || !newBookmark.value.url) {
+                    // 处理自定义页面
+                    let page = newBookmark.value.page;
+                    if (page === '__custom__') {
+                        if (!customPage.value.trim()) {
+                            showAlert('error', '请输入新页面名称');
+                            return;
+                        }
+                        page = customPage.value.trim();
+                    }
+
+                    // 处理自定义类别
+                    let categoryName = newBookmark.value.category;
+                    if (categoryName === '__custom__') {
+                        if (!customCategory.value.trim()) {
+                            showAlert('error', '请输入新类别名称');
+                            return;
+                        }
+                        categoryName = customCategory.value.trim();
+                    }
+
+                    if (!page || !categoryName || !newBookmark.value.name || !newBookmark.value.url) {
                         showAlert('error', '请填写完整信息');
                         return;
                     }
-
-                    const page = newBookmark.value.page;
-                    const categoryName = newBookmark.value.category;
 
                     if (!bookmarks.value[page]) {
                         bookmarks.value[page] = [];
@@ -869,6 +971,8 @@
                     showAlert('success', '书签添加成功！');
                     newBookmark.value.name = '';
                     newBookmark.value.url = '';
+                    customPage.value = '';
+                    customCategory.value = '';
                     
                     // 切换到添加的页面
                     currentPage.value = page;
@@ -900,7 +1004,17 @@
                 const saveEdit = () => {
                     if (!selectedBookmark.value) return;
 
-                    if (!editBookmark.value.category || !editBookmark.value.name || !editBookmark.value.url) {
+                    // 处理自定义类别
+                    let categoryName = editBookmark.value.category;
+                    if (categoryName === '__custom__') {
+                        if (!customEditCategory.value.trim()) {
+                            showAlert('error', '请输入新类别名称');
+                            return;
+                        }
+                        categoryName = customEditCategory.value.trim();
+                    }
+
+                    if (!categoryName || !editBookmark.value.name || !editBookmark.value.url) {
                         showAlert('error', '请填写完整信息');
                         return;
                     }
@@ -925,9 +1039,9 @@
                     }
 
                     // 添加新书签
-                    let newCat = bookmarks.value[page].find(cat => cat.name === editBookmark.value.category);
+                    let newCat = bookmarks.value[page].find(cat => cat.name === categoryName);
                     if (!newCat) {
-                        newCat = { name: editBookmark.value.category, links: [] };
+                        newCat = { name: categoryName, links: [] };
                         bookmarks.value[page].push(newCat);
                     }
 
@@ -938,6 +1052,7 @@
 
                     showAlert('success', '书签修改成功！');
                     selectedBookmark.value = null;
+                    customEditCategory.value = '';
                 };
 
                 const cancelEdit = () => {
@@ -968,6 +1083,10 @@
 
                 const toggleCategory = (category) => {
                     collapsedCategories.value[category] = !collapsedCategories.value[category];
+                    // 展开/折叠后重新初始化 Sortable
+                    setTimeout(() => {
+                        initSortable();
+                    }, 350); // 等待折叠动画完成
                 };
 
                 const handleSave = async () => {
@@ -981,8 +1100,27 @@
                         const newJson = JSON.stringify(bookmarks.value, null, 4);
                         const newContent = fileContent.value.replace(pattern, `const bookmarks = ref(${newJson});`);
 
-                        // 优先尝试直接覆盖
-                        if ('showSaveFilePicker' in window && originalFile.value) {
+                        // 优先使用已保存的文件句柄直接覆盖
+                        if (fileHandle.value) {
+                            try {
+                                const writable = await fileHandle.value.createWritable();
+                                await writable.write(newContent);
+                                await writable.close();
+                                
+                                showAlert('success', '文件已保存！');
+                                return;
+                            } catch (error) {
+                                if (error.name === 'NotAllowedError') {
+                                    showAlert('error', '没有写入权限，请重新选择文件');
+                                    fileHandle.value = null;
+                                } else {
+                                    console.error('直接保存失败:', error);
+                                }
+                            }
+                        }
+
+                        // 如果没有文件句柄，尝试使用 showSaveFilePicker
+                        if ('showSaveFilePicker' in window) {
                             try {
                                 const options = {
                                     suggestedName: fileName.value,
@@ -993,6 +1131,8 @@
                                 };
                                 
                                 const handle = await window.showSaveFilePicker(options);
+                                fileHandle.value = handle; // 保存句柄供下次使用
+                                
                                 const writable = await handle.createWritable();
                                 await writable.write(newContent);
                                 await writable.close();
@@ -1004,7 +1144,7 @@
                                     showAlert('info', '保存已取消');
                                     return;
                                 }
-                                // 如果直接覆盖失败，继续执行下载
+                                console.error('保存对话框失败:', error);
                             }
                         }
 
@@ -1098,12 +1238,15 @@
                     allCategories,
                     groupedBookmarks,
                     newBookmark,
+                    customPage,
+                    customCategory,
                     editBookmark,
+                    customEditCategory,
                     selectedBookmark,
                     alert,
                     editCard,
                     collapsedCategories,
-                    loadFile,
+                    openFileWithHandle,
                     addBookmark,
                     selectBookmark,
                     saveEdit,

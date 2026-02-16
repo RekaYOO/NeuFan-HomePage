@@ -522,7 +522,32 @@
                         return;
                     }
 
-                    // 处理学术情景搜索生成的按钮（新标签页打开）
+                    // 处理搜索场景生成的按钮（新标签页打开，不强制校内但支持校内访问）
+                    if (linkData && linkData.isSearchAccess) {
+                        event.preventDefault();
+                        
+                        if (webvpnMode.value > 0) {
+                            // 校内模式：通过WebVPN访问
+                            try {
+                                const { protocol, domain, port, pathPart } = parseUrl(originalUrl);
+                                const encryptedDomainUrl = await encryptUrlBrowser(domain, protocol, port);
+                                const finalUrl = encryptedDomainUrl + pathPart;
+                                window.open(finalUrl, '_blank');
+                                searchQuery.value = ''; // 清空输入框
+                            } catch (error) {
+                                console.error('WebVPN访问失败:', error);
+                                window.open(originalUrl, '_blank');
+                                searchQuery.value = ''; // 清空输入框
+                            }
+                        } else {
+                            // 直连模式：直接打开原始URL
+                            window.open(originalUrl, '_blank');
+                            searchQuery.value = ''; // 清空输入框
+                        }
+                        return;
+                    }
+
+                    // 处理学术数据库访问场景（需要校内访问支持）
                     if (linkData && linkData.isAcademicAccess) {
                         event.preventDefault();
 
@@ -538,6 +563,10 @@
                                 window.open(originalUrl, '_blank');
                                 searchQuery.value = ''; // 清空输入框
                             }
+                        } else {
+                            // 直连模式：直接打开原始URL
+                            window.open(originalUrl, '_blank');
+                            searchQuery.value = ''; // 清空输入框
                         }
                         return;
                     }
@@ -664,12 +693,12 @@
                     "url": "http://neucsecg.neu.edu.cn"
                 },
                 {
-                    "name": "MATHE",
-                    "url": "http://neumathe.cn"
-                },
-                {
                     "name": "慕课",
                     "url": "https://www.icourse163.org/"
+                },
+                {
+                    "name": "NEUMATHE",
+                    "url": "http://neumathe.cn"
                 },
                 {
                     "name": "超星平台",
@@ -720,14 +749,6 @@
                 {
                     "name": "使用方法",
                     "url": "https://mygo.neu.fan/about.html"
-                },
-                {
-                    "name": "TOOLS",
-                    "url": "http://113.44.139.48:40116"
-                },
-                {
-                    "name": "Draw",
-                    "url": "http://draw.neu.fan"
                 }
             ]
         }
@@ -1006,7 +1027,7 @@
                     "url": "https://www.scopus.com"
                 },
                 {
-                    "name": "WOF",
+                    "name": "WOS",
                     "url": "https://www.webofscience.com"
                 },
                 {
@@ -1094,6 +1115,10 @@
                 {
                     "name": "谷歌学术镜像2",
                     "url": "https://ac.linglu.pro/"
+                },
+                {
+                    "name": "秘塔AI搜索",
+                    "url": "https://metaso.cn"
                 }
             ]
         }
@@ -1244,6 +1269,34 @@
                                     }]
                                 });
                             }
+                        } else if (allResults.length === 0 && !isValidUrl(query)) {
+                            // 如果搜索词不是URL且没有匹配结果，显示搜索选项
+                            const encodedQuery = encodeURIComponent(query);
+                            allResults.push({
+                                name: '在以下站点内搜索',
+                                links: [
+                                    {
+                                        name: '谷歌学术',
+                                        url: `https://scholar.google.com/scholar?hl=zh-CN&as_sdt=0%2C5&q=${encodedQuery}&btnG=`,
+                                        isSearchAccess: true  // 使用新的标识
+                                    },
+                                    {
+                                        name: '谷歌学术镜像',
+                                        url: `https://scholar.lanfanshu.cn/scholar?hl=zh-CN&as_sdt=0%2C5&q=${encodedQuery}`,
+                                        isSearchAccess: true
+                                    },
+                                    {
+                                        name: 'Medcite',
+                                        url: `https://medcite.cn/search/${encodedQuery}`,
+                                        isSearchAccess: true
+                                    },
+                                    {
+                                        name: '知网',
+                                        url: `https://kns.cnki.net/kns8s/defaultresult/index?kw=${encodedQuery}`,
+                                        isSearchAccess: true
+                                    }
+                                ]
+                            });
                         }
 
                         return allResults;
