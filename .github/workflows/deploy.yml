@@ -5,6 +5,7 @@ on:
     paths:
       - 'index.html'
       - 'about.html'
+      - 'data/bookmarks.json'
     branches:
       - main  # 根据你的默认分支名称修改，可能是 master
 
@@ -33,6 +34,6 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SERVER_PORT }}
-          source: "index.html,about.html"
+          source: "index.html,about.html,data/bookmarks.json"
           target: "/opt/1panel/www/sites/mygo.neu.fan/index"
           overwrite: true

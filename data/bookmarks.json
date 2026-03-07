@@ -1,0 +1,490 @@
+{
+    "quick": [
+        {
+            "name": "平台",
+            "links": [
+                {
+                    "name": "旧教务系统",
+                    "url": "http://219.216.96.4/eams/"
+                },
+                {
+                    "name": "新教务系统",
+                    "url": "http://jwxt.neu.edu.cn"
+                },
+                {
+                    "name": "一网通办",
+                    "url": "http://eone.neu.edu.cn"
+                },
+                {
+                    "name": "信息门户",
+                    "url": "https://portal.neu.edu.cn"
+                },
+                {
+                    "name": "统一资源",
+                    "url": "https://webvpn.neu.edu.cn"
+                },
+                {
+                    "name": "数学机考",
+                    "url": "http://mathe.neu.edu.cn"
+                },
+                {
+                    "name": "工商管理",
+                    "url": "http://sba.neu.edu.cn"
+                },
+                {
+                    "name": "图书馆",
+                    "url": "http://www.lib.neu.edu.cn"
+                },
+                {
+                    "name": "创院平台",
+                    "url": "http://cxcy.neu.edu.cn/m"
+                },
+                {
+                    "name": "选课",
+                    "url": "http://jwxk.neu.edu.cn"
+                },
+                {
+                    "name": "人文选修开课清单",
+                    "url": "http://aao.neu.edu.cn/2026/0305/c9405a450686/page.htm"
+                }
+            ]
+        },
+        {
+            "name": "课程",
+            "links": [
+                {
+                    "name": "希冀",
+                    "url": "http://neucsecg.neu.edu.cn"
+                },
+                {
+                    "name": "慕课",
+                    "url": "https://www.icourse163.org/"
+                },
+                {
+                    "name": "NEUMATHE",
+                    "url": "http://neumathe.cn"
+                },
+                {
+                    "name": "超星平台",
+                    "url": "http://dbdx.fanya.chaoxing.com/portal"
+                },
+                {
+                    "name": "批改网",
+                    "url": "https://www.pigai.org/"
+                },
+                {
+                    "name": "BB平台",
+                    "url": "https://bb.neu.edu.cn"
+                },
+                {
+                    "name": "OJ",
+                    "url": "oj.neu.edu.cn"
+                }
+            ]
+        },
+        {
+            "name": "AI",
+            "links": [
+                {
+                    "name": "Gemini",
+                    "url": "https://gemini.google.com/app"
+                },
+                {
+                    "name": "豆包",
+                    "url": "https://www.doubao.com/chat/"
+                },
+                {
+                    "name": "DeepSeek",
+                    "url": "https://chat.deepseek.com/"
+                },
+                {
+                    "name": "通义",
+                    "url": "https://tongyi.aliyun.com/qianwen/"
+                },
+                {
+                    "name": "GPT",
+                    "url": "https://chatgpt.com"
+                }
+            ]
+        },
+        {
+            "name": "本站",
+            "links": [
+                {
+                    "name": "使用方法",
+                    "url": "./about.html"
+                }
+            ]
+        }
+    ],
+    "neu": [
+        {
+            "name": "公告",
+            "links": [
+                {
+                    "name": "后勤",
+                    "url": "http://hqfw.neu.edu.cn/"
+                },
+                {
+                    "name": "学生指导中心",
+                    "url": "http://zdfw.neu.edu.cn/"
+                },
+                {
+                    "name": "信息公开",
+                    "url": "http://info.neu.edu.cn/"
+                },
+                {
+                    "name": "基建",
+                    "url": "http://jjch.neu.edu.cn/"
+                },
+                {
+                    "name": "资产处",
+                    "url": "http://zcc.neu.edu.cn"
+                },
+                {
+                    "name": "规范性文件",
+                    "url": "https://plat.neu.edu.cn/normative-document/documents"
+                }
+            ]
+        },
+        {
+            "name": "资料",
+            "links": [
+                {
+                    "name": "研招网",
+                    "url": "http://yz.neu.edu.cn/"
+                },
+                {
+                    "name": "就业信息网",
+                    "url": "http://job.neu.edu.cn"
+                },
+                {
+                    "name": "招聘会",
+                    "url": "http://job.neu.edu.cn/jobfair"
+                }
+            ]
+        },
+        {
+            "name": "学习事务",
+            "links": [
+                {
+                    "name": "教务BB",
+                    "url": "https://bb.neu.edu.cn/"
+                },
+                {
+                    "name": "教务处",
+                    "url": "http://aao.neu.edu.cn"
+                },
+                {
+                    "name": "NEX",
+                    "url": "https://www.neu-nex.fun"
+                },
+                {
+                    "name": "学工系统",
+                    "url": "https://xg.neu.edu.cn"
+                }
+            ]
+        },
+        {
+            "name": "生活服务",
+            "links": [
+                {
+                    "name": "IP网关",
+                    "url": "https://ipgw.neu.edu.cn"
+                },
+                {
+                    "name": "电话簿",
+                    "url": "https://plat.neu.edu.cn/telephone-directory/home"
+                },
+                {
+                    "name": "勤工助学",
+                    "url": "http://qzzx.neu.edu.cn/HomePage.aspx"
+                },
+                {
+                    "name": "浑南管委会",
+                    "url": "http://hnxqgwh.neu.edu.cn"
+                },
+                {
+                    "name": "学生邮箱",
+                    "url": "http://mails.neu.edu.cn"
+                },
+                {
+                    "name": "MRTG",
+                    "url": "https://mrtg.neu.edu.cn"
+                }
+            ]
+        }
+    ],
+    "tool": [
+        {
+            "name": "实用",
+            "links": [
+                {
+                    "name": "直线拟合",
+                    "url": "http://linify.me"
+                },
+                {
+                    "name": "卫星云图",
+                    "url": "https://zoom.earth/"
+                },
+                {
+                    "name": "贝贝工具",
+                    "url": "https://xbeibeix.com/"
+                },
+                {
+                    "name": "AI检测",
+                    "url": "https://app.gptzero.me/app"
+                }
+            ]
+        },
+        {
+            "name": "学习",
+            "links": [
+                {
+                    "name": "流程图",
+                    "url": "https://excalidraw.com/"
+                },
+                {
+                    "name": "linux使用指南",
+                    "url": "https://missing.lcpu.dev/#VPContent"
+                },
+                {
+                    "name": "Wolframalpha",
+                    "url": "https://www.wolframalpha.com/"
+                },
+                {
+                    "name": "GGB",
+                    "url": "https://www.geogebra.org/calculator"
+                }
+            ]
+        },
+        {
+            "name": "趣味",
+            "links": [
+                {
+                    "name": "BA生成器",
+                    "url": "http://symbolon.pages.dev"
+                },
+                {
+                    "name": "帮你BING",
+                    "url": "https://letmebingthatforyou.com/"
+                },
+                {
+                    "name": "oOo0O",
+                    "url": "https://ooooooooooooooooooooooo.ooo/"
+                },
+                {
+                    "name": "颜文字JS",
+                    "url": "https://utf-8.jp/public/aaencode.html"
+                }
+            ]
+        }
+    ],
+    "ai": [
+        {
+            "name": "通用",
+            "links": [
+                {
+                    "name": "Grok",
+                    "url": "https://grok.com/"
+                },
+                {
+                    "name": "Gemini",
+                    "url": "https://gemini.google.com/app"
+                },
+                {
+                    "name": "GPT",
+                    "url": "https://chatgpt.com"
+                },
+                {
+                    "name": "Claude",
+                    "url": "https://claude.ai"
+                },
+                {
+                    "name": "Qwen",
+                    "url": "https://chat.qwen.ai/"
+                },
+                {
+                    "name": "千问",
+                    "url": "https://www.qianwen.com/"
+                },
+                {
+                    "name": "GLM",
+                    "url": "https://chat.z.ai/"
+                },
+                {
+                    "name": "智谱",
+                    "url": "https://chatglm.cn/main?lang=zh"
+                },
+                {
+                    "name": "MiniMax",
+                    "url": "https://chat.minimaxi.com/"
+                },
+                {
+                    "name": "豆包",
+                    "url": "https://www.doubao.com/chat/"
+                },
+                {
+                    "name": "Kimi",
+                    "url": "https://www.kimi.com/zh/"
+                }
+            ]
+        },
+        {
+            "name": "Agent",
+            "links": [
+                {
+                    "name": "扣子空间",
+                    "url": "https://space.coze.cn"
+                }
+            ]
+        },
+        {
+            "name": "特化",
+            "links": [
+                {
+                    "name": "P2G",
+                    "url": "https://www.paper2gal.top"
+                }
+            ]
+        },
+        {
+            "name": "工作台",
+            "links": [
+                {
+                    "name": "百炼",
+                    "url": "https://bailian.console.aliyun.com/cn-beijing/?tab=app#/app-market/suggest"
+                },
+                {
+                    "name": "月之暗面",
+                    "url": "https://platform.moonshot.cn/playground"
+                },
+                {
+                    "name": "硅基流动（off）",
+                    "url": "https://cloud.siliconflow.cn/i/y9qofYUb"
+                },
+                {
+                    "name": "AI Studio",
+                    "url": "https://aistudio.google.com/"
+                },
+                {
+                    "name": "Happy API",
+                    "url": "https://happyapi.org/register?aff=xtJm"
+                },
+                {
+                    "name": "Openrouter",
+                    "url": "https://openrouter.ai/"
+                }
+            ]
+        }
+    ],
+    "academic": [
+        {
+            "name": "通用检索",
+            "links": [
+                {
+                    "name": "CSSCI",
+                    "url": "https://cssci.nju.edu.cn/"
+                },
+                {
+                    "name": "Scopus",
+                    "url": "https://www.scopus.com"
+                },
+                {
+                    "name": "WOS",
+                    "url": "https://www.webofscience.com"
+                },
+                {
+                    "name": "知网",
+                    "url": "http://www.cnki.net"
+                },
+                {
+                    "name": "NEU学术搜索",
+                    "url": "https://neu.bohrium.com/"
+                },
+                {
+                    "name": "谷歌学术",
+                    "url": "https://scholar.google.com"
+                },
+                {
+                    "name": "万方数据资源系统",
+                    "url": "https://w.wanfangdata.com.cn"
+                }
+            ]
+        },
+        {
+            "name": "官方数据库",
+            "links": [
+                {
+                    "name": "ACM",
+                    "url": "https://dl.acm.org/"
+                },
+                {
+                    "name": "ACS",
+                    "url": "http://pubs.acs.org"
+                },
+                {
+                    "name": "ASM",
+                    "url": "https://asm.mpds.io/#start"
+                },
+                {
+                    "name": "AIP",
+                    "url": "https://pubs.aip.org/"
+                },
+                {
+                    "name": "APS",
+                    "url": "http://journals.aps.org/"
+                },
+                {
+                    "name": "CJO",
+                    "url": "https://www.cambridge.org/core"
+                },
+                {
+                    "name": "EBSCO",
+                    "url": "https://search.ebscohost.com/ "
+                },
+                {
+                    "name": "INFORMS-OL",
+                    "url": "https://pubsonline.informs.org/"
+                },
+                {
+                    "name": "IEL",
+                    "url": "https://ieeexplore.ieee.org/ "
+                },
+                {
+                    "name": "Springer",
+                    "url": "https://link.springer.com/"
+                },
+                {
+                    "name": "ScienceDirect",
+                    "url": "https://www.sciencedirect.com/"
+                },
+                {
+                    "name": "Wiley",
+                    "url": "https://onlinelibrary.wiley.com/"
+                }
+            ]
+        },
+        {
+            "name": "三方工具",
+            "links": [
+                {
+                    "name": "思谋学术",
+                    "url": "https://ac.scmor.com/"
+                },
+                {
+                    "name": "谷歌学术镜像1",
+                    "url": "https://xueshu.lanfanshu.cn/"
+                },
+                {
+                    "name": "谷歌学术镜像2",
+                    "url": "https://ac.linglu.pro/"
+                },
+                {
+                    "name": "秘塔AI搜索",
+                    "url": "https://metaso.cn"
+                }
+            ]
+        }
+    ]
+}

@@ -696,7 +696,7 @@
                     <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
                 </svg>
                 <h3>请选择一个 HTML 文件开始编辑</h3>
-                <p>点击上方按钮选择 index.html 文件</p>
+                <p>点击上方按钮选择 data/bookmarks.json 文件</p>
             </div>
         </div>
     </div>
@@ -891,8 +891,8 @@
 
                         const [handle] = await window.showOpenFilePicker({
                             types: [{
-                                description: 'HTML Files',
-                                accept: { 'text/html': ['.html'] }
+                                description: 'JSON Files',
+                                accept: { 'application/json': ['.json'] }
                             }],
                             multiple: false
                         });
@@ -905,19 +905,12 @@
                         
                         fileContent.value = content;
                         
-                        const pattern = /const bookmarks = ref\(({[\s\S]*?})\);/;
-                        const match = content.match(pattern);
-                        
-                        if (match) {
-                            bookmarks.value = JSON.parse(match[1]);
+                        bookmarks.value = JSON.parse(content);
                             showAlert('success', '文件加载成功！可以直接保存覆盖');
                             // 等待 DOM 更新后初始化拖动
                             setTimeout(() => {
                                 initSortable();
                             }, 500);
-                        } else {
-                            showAlert('error', '未找到书签数据');
-                        }
                     } catch (error) {
                         if (error.name === 'AbortError') {
                             showAlert('info', '已取消选择文件');
@@ -1096,9 +1089,7 @@
                     }
 
                     try {
-                        const pattern = /const bookmarks = ref\(({[\s\S]*?})\);/;
-                        const newJson = JSON.stringify(bookmarks.value, null, 4);
-                        const newContent = fileContent.value.replace(pattern, `const bookmarks = ref(${newJson});`);
+                        const newContent = JSON.stringify(bookmarks.value, null, 4);
 
                         // 优先使用已保存的文件句柄直接覆盖
                         if (fileHandle.value) {
@@ -1125,8 +1116,8 @@
                                 const options = {
                                     suggestedName: fileName.value,
                                     types: [{
-                                        description: 'HTML Files',
-                                        accept: { 'text/html': ['.html'] }
+                                        description: 'JSON Files',
+                                    accept: { 'application/json': ['.json'] }
                                     }]
                                 };
                                 
@@ -1149,11 +1140,11 @@
                         }
 
                         // 降级方案：下载文件
-                        const blob = new Blob([newContent], { type: 'text/html' });
+                        const blob = new Blob([newContent], { type: 'application/json' });
                         const url = URL.createObjectURL(blob);
                         const a = document.createElement('a');
                         a.href = url;
-                        a.download = fileName.value || 'index.html';
+                        a.download = fileName.value || 'bookmarks.json';
                         a.click();
                         URL.revokeObjectURL(url);
 
@@ -1170,15 +1161,13 @@
                     }
 
                     try {
-                        const pattern = /const bookmarks = ref\(({[\s\S]*?})\);/;
-                        const newJson = JSON.stringify(bookmarks.value, null, 4);
-                        const newContent = fileContent.value.replace(pattern, `const bookmarks = ref(${newJson});`);
+                        const newContent = JSON.stringify(bookmarks.value, null, 4);
 
-                        const blob = new Blob([newContent], { type: 'text/html' });
+                        const blob = new Blob([newContent], { type: 'application/json' });
                         const url = URL.createObjectURL(blob);
                         const a = document.createElement('a');
                         a.href = url;
-                        a.download = fileName.value || 'index.html';
+                        a.download = fileName.value || 'bookmarks.json';
                         a.click();
                         URL.revokeObjectURL(url);
 
@@ -1195,17 +1184,15 @@
                     }
 
                     try {
-                        const pattern = /const bookmarks = ref\(({[\s\S]*?})\);/;
-                        const newJson = JSON.stringify(bookmarks.value, null, 4);
-                        const newContent = fileContent.value.replace(pattern, `const bookmarks = ref(${newJson});`);
+                        const newContent = JSON.stringify(bookmarks.value, null, 4);
 
                         // 使用 File System Access API 直接覆盖文件
                         if ('showSaveFilePicker' in window) {
                             const options = {
                                 suggestedName: fileName.value,
                                 types: [{
-                                    description: 'HTML Files',
-                                    accept: { 'text/html': ['.html'] }
+                                    description: 'JSON Files',
+                                    accept: { 'application/json': ['.json'] }
                                 }]
                             };
                             
@@ -1261,4 +1248,3 @@
     </script>
 </body>
 </html>
-
