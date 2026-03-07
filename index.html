@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-<!--It's MYGO！！！！！-->
+<!-- It's MYGO!!!!! -->
 <script defer src="https://umami.neu.fan/script.js" data-website-id="a9126f06-b6ac-48e5-8c43-213b9395aafb"></script>
 <head>
     <meta charset="UTF-8">
@@ -93,6 +93,95 @@
             transform: translateY(-1px);
         }
 
+        .mode-switch-overlay {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 20;
+            overflow: hidden;
+            contain: paint;
+        }
+
+        .mode-switch-overlay::before {
+            content: none;
+        }
+
+        .mode-switch-overlay::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            width: 100%;
+            top: var(--scan-start-y, 180px);
+            height: 2px;
+            opacity: 0;
+            background: linear-gradient(90deg,
+                rgba(255, 255, 255, 0) 0%,
+                var(--mode-color, #4CAF50) 20%,
+                rgba(255, 255, 255, 0.95) 50%,
+                var(--mode-color, #4CAF50) 80%,
+                rgba(255, 255, 255, 0) 100%);
+            box-shadow: 0 0 12px var(--mode-color-soft, rgba(76, 175, 80, 0.18));
+            transform: translateY(0);
+        }
+
+        .mode-switch-overlay.active::after {
+            animation: scanLineMove 1000ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        .content-wrapper {
+            position: relative;
+        }
+
+        @keyframes scanLineMove {
+            0% {
+                opacity: 0;
+                transform: translateY(0);
+            }
+            10% {
+                opacity: 1;
+            }
+            85% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(calc(100vh - var(--scan-start-y, 180px) - 2px));
+            }
+        }
+
+        @keyframes modeChipFade {
+            0% {
+                opacity: 0;
+                transform: translateY(8px) scale(0.985);
+            }
+            18% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            58% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-4px) scale(1);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .mode-switch-overlay.active::after,
+            .mode-status-chip.visible {
+                animation-duration: 1ms !important;
+            }
+
+            .links a,
+            .webvpn-button,
+            .nav-buttons a,
+            .arrow-button {
+                transition: none;
+            }
+        }
+
         main {
             padding: 20px;
             max-width: 1200px;
@@ -159,6 +248,59 @@
             padding-bottom: 10px;
             font-size: 1.8rem;
             margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .section-title-text {
+            min-width: 0;
+        }
+
+        .mode-status-chip {
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 10px 5px 8px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--mode-color, #666);
+            background-color: rgba(255, 255, 255, 0.88);
+            border: 1px solid var(--mode-color-soft, rgba(76, 175, 80, 0.16));
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            white-space: nowrap;
+            opacity: 0;
+            transform: translateY(8px) scale(0.985);
+            will-change: transform, opacity;
+        }
+
+        .mode-status-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            border-radius: 999px;
+            background-color: var(--mode-color-soft, rgba(76, 175, 80, 0.10));
+            box-shadow: inset 0 0 0 1px var(--mode-color-soft, rgba(76, 175, 80, 0.16));
+            font-size: 0.75rem;
+            font-weight: 700;
+            line-height: 1;
+            color: var(--mode-color, #666);
+            will-change: transform, opacity;
+        }
+
+        .mode-status-label {
+            letter-spacing: 0.01em;
+        }
+
+        .mode-status-chip.visible {
+            animation: modeChipFade 1600ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
         }
 
         .links {
@@ -307,11 +449,18 @@
             </div>
         </header>
         <main>
+            <div class="mode-switch-overlay" :class="{ active: isModeAnimating }"></div>
             <div class="content-wrapper">
                 <transition :name="useAnimation ? 'slide' : ''" mode="out-in">
                     <div :key="currentPage">
                         <section v-for="category in filteredCategories" :key="category.name">
-                            <h2>{{ category.name }}</h2>
+                            <h2>
+                                <span class="section-title-text">{{ category.name }}</span>
+                                <span class="mode-status-chip" :class="{ visible: showModeStatusChip }">
+                                    <span class="mode-status-icon">{{ modeStatusIcon }}</span>
+                                    <span class="mode-status-label">{{ modeStatusText }}</span>
+                                </span>
+                            </h2>
                             <div class="links">
                                 <a v-for="link in category.links"
                                    :key="link.name"
@@ -340,6 +489,10 @@
         createApp({
             setup() {
                 const searchQuery = ref('');
+                const isModeAnimating = ref(false);
+                const showModeStatusChip = ref(false);
+                let overlayTimer = null;
+                let modeStatusTimer = null;
                 const showBeian = ref(true);
                 const currentPage = ref('quick');
                 const pageOrder = ['quick', 'neu', 'tool','ai','academic'];
@@ -460,8 +613,52 @@
                 };
 
                 // 切换模式 (三态循环: 0 -> 1 -> 2 -> 0)
-                const toggleWebVPN = () => {
-                    webvpnMode.value = (webvpnMode.value + 1) % 3;
+                const getModeColor = (mode) => {
+                    switch (mode) {
+                        case 1: return { solid: '#ff6b35', soft: 'rgba(255, 107, 53, 0.12)', strong: 'rgba(255, 107, 53, 0.24)' };
+                        case 2: return { solid: '#9c27b0', soft: 'rgba(156, 39, 176, 0.12)', strong: 'rgba(156, 39, 176, 0.22)' };
+                        default: return { solid: '#666666', soft: 'rgba(102, 102, 102, 0.10)', strong: 'rgba(102, 102, 102, 0.18)' };
+                    }
+                };
+
+                const triggerModeSwitchAnimation = (nextMode) => {
+                    const modeColor = getModeColor(nextMode);
+                    const headerElement = document.querySelector('header');
+                    const scanStartY = headerElement ? `${headerElement.getBoundingClientRect().bottom}px` : '180px';
+
+                    document.body.style.setProperty('--mode-color', modeColor.solid);
+                    document.body.style.setProperty('--mode-color-soft', modeColor.soft);
+                    document.body.style.setProperty('--mode-color-strong', modeColor.strong);
+                    document.body.style.setProperty('--scan-start-y', scanStartY);
+
+                    isModeAnimating.value = false;
+                    showModeStatusChip.value = false;
+                    document.body.classList.remove('mode-switching');
+                    if (overlayTimer) {
+                        clearTimeout(overlayTimer);
+                    }
+                    if (modeStatusTimer) {
+                        clearTimeout(modeStatusTimer);
+                    }
+
+                    requestAnimationFrame(() => {
+                        isModeAnimating.value = true;
+                        showModeStatusChip.value = true;
+                        document.body.classList.add('mode-switching');
+                        overlayTimer = setTimeout(() => {
+                            isModeAnimating.value = false;
+                            document.body.classList.remove('mode-switching');
+                        }, 900);
+                        modeStatusTimer = setTimeout(() => {
+                            showModeStatusChip.value = false;
+                        }, 1600);
+                    });
+                };
+
+                const toggleWebVPN = (event) => {
+                    const nextMode = (webvpnMode.value + 1) % 3;
+                    webvpnMode.value = nextMode;
+                    triggerModeSwitchAnimation(nextMode);
                 };
 
                 // 获取按钮文字
@@ -471,6 +668,24 @@
                         case 1: return '校内模式';
                         case 2: return '备用模式';
                         default: return '直连模式';
+                    }
+                });
+
+                const modeStatusText = computed(() => {
+                    switch (webvpnMode.value) {
+                        case 0: return '当前直连';
+                        case 1: return '当前校内';
+                        case 2: return '当前备用';
+                        default: return '当前直连';
+                    }
+                });
+
+                const modeStatusIcon = computed(() => {
+                    switch (webvpnMode.value) {
+                        case 0: return '·';
+                        case 1: return '⌂';
+                        case 2: return '✦';
+                        default: return '·';
                     }
                 });
 
@@ -1254,13 +1469,12 @@
                             if (isAcademic) {
                                 // 学术数据库域名
                                 allResults.push({
-                                    name: '此数据库支持校园网免费访问',
+                                    name: '此数据库从校园网或校内模式访问免费',
                                     links: [{
-                                        name: webvpnMode.value > 0 ? `访问 ${truncateText(query)}` : '请点击“直连模式”以打开校内模式',
+                                        name: `访问 ${truncateText(query)}`,
                                         url: processedUrl,
                                         isDirectAccess: true,
-                                        isAcademicAccess: true,
-                                        disabled: webvpnMode.value === 0
+                                        isAcademicAccess: true
                                     }]
                                 });
                             } else {
@@ -1328,8 +1542,12 @@
                     handleArrowClick,
                     useAnimation,
                     webvpnMode,
+                    isModeAnimating,
+                    showModeStatusChip,
                     toggleWebVPN,
                     webvpnButtonText,
+                    modeStatusText,
+                    modeStatusIcon,
                     getProcessedUrl,
                     handleLinkClick
                 };
