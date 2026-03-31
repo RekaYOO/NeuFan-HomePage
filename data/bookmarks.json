@@ -38,14 +38,6 @@
                 {
                     "name": "创院平台",
                     "url": "http://cxcy.neu.edu.cn/m"
-                },
-                {
-                    "name": "选课",
-                    "url": "http://jwxk.neu.edu.cn"
-                },
-                {
-                    "name": "人文选修开课清单",
-                    "url": "http://aao.neu.edu.cn/2026/0305/c9405a450686/page.htm"
                 }
             ]
         },
@@ -112,7 +104,7 @@
             "links": [
                 {
                     "name": "使用方法",
-                    "url": "./about.html"
+                    "url": "https://mygo.neu.fan/about.html"
                 }
             ]
         }
@@ -144,6 +136,10 @@
                 {
                     "name": "规范性文件",
                     "url": "https://plat.neu.edu.cn/normative-document/documents"
+                },
+                {
+                    "name": "采购招标",
+                    "url": "http://www.czzx.neu.edu.cn/"
                 }
             ]
         },
@@ -161,6 +157,10 @@
                 {
                     "name": "招聘会",
                     "url": "http://job.neu.edu.cn/jobfair"
+                },
+                {
+                    "name": "科研院",
+                    "url": "http://kyy.neu.edu.cn/"
                 }
             ]
         },
@@ -182,6 +182,18 @@
                 {
                     "name": "学工系统",
                     "url": "https://xg.neu.edu.cn"
+                },
+                {
+                    "name": "创新网",
+                    "url": "http://cxzx.neu.edu.cn/"
+                },
+                {
+                    "name": "人文选修-2026",
+                    "url": "http://aao.neu.edu.cn/2026/0305/c9405a450686/page.htm"
+                },
+                {
+                    "name": "选课系统",
+                    "url": "http://jwxk.neu.edu.cn"
                 }
             ]
         },
@@ -211,6 +223,10 @@
                 {
                     "name": "MRTG",
                     "url": "https://mrtg.neu.edu.cn"
+                },
+                {
+                    "name": "校友会",
+                    "url": "http://alumni.neu.edu.cn/"
                 }
             ]
         }
