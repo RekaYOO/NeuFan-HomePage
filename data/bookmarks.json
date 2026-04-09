@@ -396,6 +396,15 @@
                     "url": "https://openrouter.ai/"
                 }
             ]
+        },
+        {
+            "name": "音像",
+            "links": [
+                {
+                    "name": "即梦",
+                    "url": "https://jimeng.jianying.com/ai-tool/home/"
+                }
+            ]
         }
     ],
     "academic": [
