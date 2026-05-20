@@ -924,6 +924,21 @@
 
                 loadBookmarks();
 
+                // 全局键盘监听：直接打字自动聚焦搜索框并输入
+                document.addEventListener('keydown', (e) => {
+                    const tag = document.activeElement?.tagName?.toLowerCase();
+                    if (tag === 'input' || tag === 'textarea' || document.activeElement?.isContentEditable) return;
+                    if (e.ctrlKey || e.altKey || e.metaKey) return;
+                    if (e.key.length > 1) return;
+
+                    e.preventDefault();
+                    const searchInput = document.querySelector('header input[type="text"]');
+                    if (searchInput) {
+                        searchInput.focus();
+                        searchQuery.value += e.key;
+                    }
+                });
+
                 // 书签数据
                 const filteredCategories = computed(() => {
                     const query = searchQuery.value.trim();
