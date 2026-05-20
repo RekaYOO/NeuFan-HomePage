@@ -904,9 +904,13 @@
                 };
 
                 const handlePageClick = (pageId) => {
-                    currentPage.value = pageId;
-                    currentIndex.value = filteredPageOrder.value.indexOf(pageId);
-                    pageLocked.value = true;
+                    if (pageId === currentPage.value) {
+                        pageLocked.value = !pageLocked.value;
+                    } else {
+                        currentPage.value = pageId;
+                        currentIndex.value = filteredPageOrder.value.indexOf(pageId);
+                        pageLocked.value = true;
+                    }
                     useAnimation.value = true;
                 };
 
