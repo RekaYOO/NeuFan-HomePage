@@ -984,7 +984,8 @@
                             pageBookmarks.forEach(category => {
                                 const matchedLinks = category.links.filter(link =>
                                     link.name.toLowerCase().includes(lowerQuery) ||
-                                    link.url.toLowerCase().includes(lowerQuery)
+                                    link.url.toLowerCase().includes(lowerQuery) ||
+                                    (link.aliases && link.aliases.some(alias => alias.toLowerCase().includes(lowerQuery)))
                                 );
 
                                 if (matchedLinks.length > 0) {

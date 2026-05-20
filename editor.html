@@ -6,6 +6,7 @@
     <title>书签编辑器 - NEUFAN</title>
     <link rel="icon" type="image/jpg" href="./icon.jpg">
     <script src="https://unpkg.com/vue@3.2.31/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/pinyin-pro"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
         * {
@@ -426,6 +427,15 @@
             white-space: nowrap;
         }
 
+        .bookmark-aliases {
+            color: #888;
+            font-size: 0.8rem;
+            margin-top: 4px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
         .bookmark-actions {
             display: flex;
             gap: 8px;
@@ -568,11 +578,15 @@
                             </div>
                             <div class="form-group">
                                 <label>名称</label>
-                                <input v-model="newBookmark.name" placeholder="输入书签名称" @keyup.enter="addBookmark" />
+                                <input v-model="newBookmark.name" placeholder="输入书签名称" @blur="maybeAutoFillAliases(newBookmark)" @keyup.enter="addBookmark" />
                             </div>
                             <div class="form-group">
                                 <label>URL</label>
                                 <input v-model="newBookmark.url" placeholder="输入网址" @keyup.enter="addBookmark" />
+                            </div>
+                            <div class="form-group">
+                                <label>别名（可选，逗号分隔）</label>
+                                <input v-model="newBookmark.aliases" placeholder="自动从名称生成拼音别名" @keyup.enter="addBookmark" />
                             </div>
                             <button class="btn btn-primary" @click="addBookmark">添加书签</button>
                         </div>
@@ -598,11 +612,15 @@
                             </div>
                             <div class="form-group">
                                 <label>名称</label>
-                                <input v-model="editBookmark.name" @keyup.enter="saveEdit" />
+                                <input v-model="editBookmark.name" @blur="maybeAutoFillAliases(editBookmark)" @keyup.enter="saveEdit" />
                             </div>
                             <div class="form-group">
                                 <label>URL</label>
                                 <input v-model="editBookmark.url" @keyup.enter="saveEdit" />
+                            </div>
+                            <div class="form-group">
+                                <label>别名（可选，逗号分隔）</label>
+                                <input v-model="editBookmark.aliases" placeholder="自动从名称生成拼音别名" @keyup.enter="saveEdit" />
                             </div>
                             <div class="button-group">
                                 <button class="btn btn-secondary" @click="saveEdit">保存</button>
@@ -661,6 +679,9 @@
                                                         {{ item.name }}
                                                     </div>
                                                     <div class="bookmark-url">{{ item.url }}</div>
+                                                    <div v-if="item.aliases && item.aliases.length" class="bookmark-aliases">
+                                                        🔤 {{ item.aliases.join(', ') }}
+                                                    </div>
                                                 </div>
                                                 <div class="bookmark-actions">
                                                     <button class="btn btn-secondary btn-icon" 
@@ -723,7 +744,8 @@
                     page: 'quick',
                     category: '',
                     name: '',
-                    url: ''
+                    url: '',
+                    aliases: ''
                 });
 
                 const customPage = ref('');
@@ -733,7 +755,8 @@
                 const editBookmark = ref({
                     category: '',
                     name: '',
-                    url: ''
+                    url: '',
+                    aliases: ''
                 });
 
                 const pages = computed(() => {
@@ -770,10 +793,40 @@
                             page: currentPage.value,
                             category: category.name,
                             name: link.name,
-                            url: link.url
+                            url: link.url,
+                            aliases: link.aliases || []
                         }))
                     }));
                 });
+
+                const computeAliases = (name) => {
+                    if (!window.pinyinPro || !name) return [];
+                    try {
+                        const { pinyin } = window.pinyinPro;
+                        const fullArr = pinyin(name, { toneType: 'none', type: 'array' });
+                        const firstArr = pinyin(name, { toneType: 'none', pattern: 'first', type: 'array' });
+                        const full = fullArr.join('').toLowerCase();
+                        const first = firstArr.join('').toLowerCase();
+                        const aliases = [];
+                        if (full) aliases.push(full);
+                        if (first && first !== full) aliases.push(first);
+                        return aliases;
+                    } catch (e) {
+                        return [];
+                    }
+                };
+
+                const parseAliases = (str) => {
+                    if (!str || !str.trim()) return [];
+                    return str.split(/[,，]/).map(s => s.trim()).filter(s => s);
+                };
+
+                const maybeAutoFillAliases = (bookmark) => {
+                    if (!bookmark) return;
+                    if (bookmark.aliases && bookmark.aliases.trim()) return;
+                    const computed = computeAliases(bookmark.name);
+                    bookmark.aliases = computed.join(', ');
+                };
 
                 const setCategoryRef = (category, el) => {
                     if (el) {
@@ -956,14 +1009,17 @@
                         bookmarks.value[page].push(category);
                     }
 
+                    const aliases = parseAliases(newBookmark.value.aliases);
                     category.links.push({
                         name: newBookmark.value.name,
-                        url: newBookmark.value.url
+                        url: newBookmark.value.url,
+                        aliases: aliases
                     });
 
                     showAlert('success', '书签添加成功！');
                     newBookmark.value.name = '';
                     newBookmark.value.url = '';
+                    newBookmark.value.aliases = '';
                     customPage.value = '';
                     customCategory.value = '';
                     
@@ -980,7 +1036,8 @@
                     editBookmark.value = {
                         category: item.category,
                         name: item.name,
-                        url: item.url
+                        url: item.url,
+                        aliases: (item.aliases || []).join(', ')
                     };
                     
                     // 滚动到编辑区域
@@ -1038,9 +1095,11 @@
                         bookmarks.value[page].push(newCat);
                     }
 
+                    const aliases = parseAliases(editBookmark.value.aliases);
                     newCat.links.push({
                         name: editBookmark.value.name,
-                        url: editBookmark.value.url
+                        url: editBookmark.value.url,
+                        aliases: aliases
                     });
 
                     showAlert('success', '书签修改成功！');
@@ -1241,7 +1300,8 @@
                     deleteBookmark,
                     toggleCategory,
                     handleSave,
-                    setCategoryRef
+                    setCategoryRef,
+                    maybeAutoFillAliases
                 };
             }
         }).mount('#app');
