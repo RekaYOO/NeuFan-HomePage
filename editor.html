@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>书签编辑器 - NEUFAN</title>
     <link rel="icon" type="image/jpg" href="./icon.jpg">
-    <script src="https://unpkg.com/vue@3.2.31/dist/vue.global.js"></script>
+    <script src="./assets/vue.global.prod.js"></script>
     <script src="https://unpkg.com/pinyin-pro"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
@@ -1157,7 +1157,7 @@
                                 await writable.write(newContent);
                                 await writable.close();
                                 
-                                showAlert('success', '文件已保存！');
+                                showAlert('success', '文件已保存！提交并推送后，部署会自动更新线上缓存版本。');
                                 return;
                             } catch (error) {
                                 if (error.name === 'NotAllowedError') {
@@ -1187,7 +1187,7 @@
                                 await writable.write(newContent);
                                 await writable.close();
                                 
-                                showAlert('success', '文件已保存！');
+                                showAlert('success', '文件已保存！提交并推送后，部署会自动更新线上缓存版本。');
                                 return;
                             } catch (error) {
                                 if (error.name === 'AbortError') {
@@ -1207,7 +1207,7 @@
                         a.click();
                         URL.revokeObjectURL(url);
 
-                        showAlert('success', '文件已下载！');
+                        showAlert('success', '文件已下载！替换仓库文件并推送后，部署会自动更新线上缓存版本。');
                     } catch (error) {
                         showAlert('error', '保存失败: ' + error.message);
                     }
@@ -1230,7 +1230,7 @@
                         a.click();
                         URL.revokeObjectURL(url);
 
-                        showAlert('success', '文件下载成功！');
+                        showAlert('success', '文件下载成功！替换仓库文件并推送后，部署会自动更新线上缓存版本。');
                     } catch (error) {
                         showAlert('error', '保存失败: ' + error.message);
                     }
@@ -1260,7 +1260,7 @@
                             await writable.write(newContent);
                             await writable.close();
                             
-                            showAlert('success', '文件已直接覆盖保存！');
+                            showAlert('success', '文件已直接覆盖保存！提交并推送后，部署会自动更新线上缓存版本。');
                         } else {
                             // 降级方案：下载文件
                             showAlert('info', '浏览器不支持直接覆盖，将下载文件');

@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NEUFAN</title>
     <link rel="icon" type="image/jpg" href="./icon.jpg">
-    <script src="https://unpkg.com/vue@3.2.31/dist/vue.global.js"></script>
+    <script src="./assets/vue.global.prod.js"></script>
     <style>
         .beian {
             background-color: #f5f5f5;
@@ -512,7 +512,9 @@
                     }
 
                     try {
-                        const response = await fetch('./data/bookmarks.json', { cache: 'no-cache' });
+                        // GitHub Actions 会在部署副本中把占位符替换为当前 commit SHA。
+                        // 同一版本可直接使用浏览器缓存，数据变更后的新 commit 则会使用新 URL。
+                        const response = await fetch('./data/bookmarks.json?v=__DEPLOY_VERSION__');
                         if (!response.ok) {
                             throw new Error(`HTTP ${response.status}`);
                         }

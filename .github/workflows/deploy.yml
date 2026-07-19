@@ -5,7 +5,11 @@ on:
     paths:
       - 'index.html'
       - 'about.html'
+      - 'editor.html'
+      - 'icon.jpg'
       - 'data/bookmarks.json'
+      - 'assets/**'
+      - '.github/workflows/deploy.yml'
     branches:
       - main  # 根据你的默认分支名称修改，可能是 master
 
@@ -16,6 +20,15 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Prepare versioned static files
+        shell: bash
+        run: |
+          mkdir -p _deploy/data _deploy/assets
+          cp index.html about.html editor.html icon.jpg _deploy/
+          cp data/bookmarks.json _deploy/data/
+          cp assets/vue.global.prod.js _deploy/assets/
+          sed -i "s/__DEPLOY_VERSION__/${GITHUB_SHA}/g" _deploy/index.html
 
       - name: Deploy to server via SSH
         uses: appleboy/ssh-action@v1.0.3
@@ -34,6 +47,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SERVER_PORT }}
-          source: "index.html,about.html,data/bookmarks.json"
+          source: "_deploy"
           target: "/opt/1panel/www/sites/mygo.neu.fan/index"
           overwrite: true
+          strip_components: 1
