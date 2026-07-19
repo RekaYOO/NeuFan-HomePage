@@ -810,7 +810,7 @@
                 },
                 {
                     "name": "EBSCO",
-                    "url": "https://search.ebscohost.com/ ",
+                    "url": "https://search.ebscohost.com/",
                     "aliases": [
                         "ebsco"
                     ]
@@ -824,7 +824,7 @@
                 },
                 {
                     "name": "IEL",
-                    "url": "https://ieeexplore.ieee.org/ ",
+                    "url": "https://ieeexplore.ieee.org/",
                     "aliases": [
                         "iel"
                     ]
@@ -885,6 +885,117 @@
                     "aliases": [
                         "mitaaisousuo",
                         "mtaiss"
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "数据库导航",
+            "links": [
+                {
+                    "name": "超星汇雅电子图书",
+                    "url": "https://hn.sslibrary.com/",
+                    "aliases": [
+                        "chaoxinghuiyadianzitushu",
+                        "cxhydzts"
+                    ]
+                },
+                {
+                    "name": "读秀图书搜索",
+                    "url": "https://www.duxiu.com/",
+                    "aliases": [
+                        "duxiutushusousuo",
+                        "dxtsss"
+                    ]
+                },
+                {
+                    "name": "维普期刊",
+                    "url": "https://qikan.cqvip.com/",
+                    "aliases": [
+                        "weipuqikan",
+                        "wpqk"
+                    ]
+                },
+                {
+                    "name": "EI Compendex",
+                    "url": "https://www.engineeringvillage.com/",
+                    "aliases": [
+                        "ei",
+                        "eicompendex",
+                        "engineeringvillage"
+                    ]
+                },
+                {
+                    "name": "ProQuest Dissertations & Theses",
+                    "url": "https://www.proquest.com/pqdtglobal/",
+                    "aliases": [
+                        "pqdt",
+                        "proquestdissertationsandtheses"
+                    ]
+                },
+                {
+                    "name": "Emerald",
+                    "url": "https://www.emerald.com/insight/",
+                    "aliases": [
+                        "emerald",
+                        "emeraldinsight"
+                    ]
+                },
+                {
+                    "name": "RSC",
+                    "url": "https://pubs.rsc.org/",
+                    "aliases": [
+                        "rsc",
+                        "royalsocietyofchemistry"
+                    ]
+                },
+                {
+                    "name": "ASCE Library",
+                    "url": "https://ascelibrary.org/",
+                    "aliases": [
+                        "asce",
+                        "ascelibrary"
+                    ]
+                },
+                {
+                    "name": "ASME Digital Collection",
+                    "url": "https://asmedigitalcollection.asme.org/",
+                    "aliases": [
+                        "asme",
+                        "asmedigitalcollection"
+                    ]
+                },
+                {
+                    "name": "Taylor & Francis",
+                    "url": "https://www.tandfonline.com/",
+                    "aliases": [
+                        "t&f",
+                        "taylorandfrancis"
+                    ]
+                },
+                {
+                    "name": "JSTOR",
+                    "url": "https://www.jstor.org/",
+                    "aliases": [
+                        "jstor",
+                        "journalstorage"
+                    ]
+                },
+                {
+                    "name": "CAS SciFinder-n",
+                    "url": "https://scifinder-n.cas.org/",
+                    "aliases": [
+                        "cas",
+                        "scifinder",
+                        "scifindern"
+                    ]
+                },
+                {
+                    "name": "Nature",
+                    "url": "https://www.nature.com/",
+                    "aliases": [
+                        "nature",
+                        "naturejournal"
                     ]
                 }
             ]

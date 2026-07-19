@@ -514,7 +514,7 @@
                     try {
                         // GitHub Actions 会在部署副本中把占位符替换为当前 commit SHA。
                         // 同一版本可直接使用浏览器缓存，数据变更后的新 commit 则会使用新 URL。
-                        const response = await fetch('./data/bookmarks.json?v=__DEPLOY_VERSION__');
+                        const response = await fetch('./data/bookmarks.json?v=__DEPLOY_VERSION__', { cache: 'force-cache' });
                         if (!response.ok) {
                             throw new Error(`HTTP ${response.status}`);
                         }
@@ -1111,6 +1111,14 @@
                 };
             }
         }).mount('#app');
+
+        if ('serviceWorker' in navigator && window.location.protocol === 'https:') {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js').catch(error => {
+                    console.warn('静态资源缓存服务注册失败:', error);
+                });
+            });
+        }
     </script>
 </body>
 <div class="beian">
