@@ -7,7 +7,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NEUFAN</title>
     <link rel="icon" type="image/jpg" href="./icon.jpg">
+    <!-- DEPLOY:VUE:START -->
     <script src="./assets/vue.global.prod.js"></script>
+    <!-- DEPLOY:VUE:END -->
+    <!-- DEPLOY:BOOKMARKS -->
     <style>
         .beian {
             background-color: #f5f5f5;
@@ -502,6 +505,13 @@
                 const loadBookmarks = async () => {
                     bookmarksLoading.value = true;
                     bookmarksError.value = false;
+
+                    // 生产部署时由构建脚本注入，源码和编辑器仍继续维护 data/bookmarks.json。
+                    if (globalThis.__NEUFAN_BOOKMARKS__) {
+                        bookmarks.value = globalThis.__NEUFAN_BOOKMARKS__;
+                        bookmarksLoading.value = false;
+                        return;
+                    }
 
                     if (window.location.protocol === 'file:') {
                         bookmarksError.value = true;
@@ -1112,12 +1122,15 @@
             }
         }).mount('#app');
 
-        if ('serviceWorker' in navigator && window.location.protocol === 'https:') {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js').catch(error => {
-                    console.warn('静态资源缓存服务注册失败:', error);
-                });
-            });
+        // 清理旧版本曾注册的 Service Worker；生产首页现已在部署时合并为单文件。
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistration('./')
+                .then(registration => registration && registration.unregister())
+                .catch(error => console.warn('旧版静态资源缓存清理失败:', error));
+        }
+        if ('caches' in window) {
+            caches.delete('neufan-static-v1')
+                .catch(error => console.warn('旧版静态资源缓存删除失败:', error));
         }
     </script>
 </body>

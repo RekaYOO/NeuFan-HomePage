@@ -24,3 +24,6 @@ yarn-error.log*
 # Logs
 *.log
 
+# Local deployment build
+_deploy/
+

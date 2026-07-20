@@ -10,6 +10,7 @@ on:
       - 'data/bookmarks.json'
       - 'assets/**'
       - 'sw.js'
+      - 'tools/build-deploy.mjs'
       - '.github/workflows/deploy.yml'
     branches:
       - main  # 根据你的默认分支名称修改，可能是 master
@@ -23,13 +24,8 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Prepare versioned static files
-        shell: bash
         run: |
-          mkdir -p _deploy/data _deploy/assets
-          cp index.html about.html editor.html icon.jpg sw.js _deploy/
-          cp data/bookmarks.json _deploy/data/
-          cp assets/vue.global.prod.js _deploy/assets/
-          sed -i "s/__DEPLOY_VERSION__/${GITHUB_SHA}/g" _deploy/index.html
+          node ./tools/build-deploy.mjs _deploy "${GITHUB_SHA}"
 
       - name: Deploy to server via SSH
         uses: appleboy/ssh-action@v1.0.3
@@ -39,7 +35,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SERVER_PORT }}
           script: |
-            echo "Starting deployment..."
+            rm -f /opt/1panel/www/sites/mygo.neu.fan/index/sw.js
             
       - name: Copy files to server
         uses: appleboy/scp-action@v0.1.7
