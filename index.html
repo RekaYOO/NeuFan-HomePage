@@ -442,7 +442,8 @@
                 <a v-for="page in filteredPages" 
                    :key="page.id"
                    :class="{ active: currentPage === page.id }"
-                   @mouseenter="!pageLocked && handlePageChange(page.id)"
+                   @mouseenter="handlePageHoverStart(page.id)"
+                   @mouseleave="handlePageHoverEnd"
                    @click="handlePageClick(page.id)">
                     {{ page.name }}
                 </a>
@@ -545,6 +546,8 @@
                 const webvpnMode = ref(0);
                 // 是否锁定页面（禁用悬浮切换）
                 const pageLocked = ref(false);
+                const pageHoverDelay = 85;
+                let pageHoverTimer = null;
 
                 // 隐藏列表 - 这些名称默认不显示，需要 ?t=all 参数才显示
                 const hiddenItems = ['工具'];
@@ -915,7 +918,27 @@
                     useAnimation.value = false;
                 };
 
+                const handlePageHoverEnd = () => {
+                    if (pageHoverTimer !== null) {
+                        clearTimeout(pageHoverTimer);
+                        pageHoverTimer = null;
+                    }
+                };
+
+                const handlePageHoverStart = (pageId) => {
+                    handlePageHoverEnd();
+                    if (pageLocked.value || pageId === currentPage.value) return;
+
+                    pageHoverTimer = setTimeout(() => {
+                        pageHoverTimer = null;
+                        if (!pageLocked.value) {
+                            handlePageChange(pageId);
+                        }
+                    }, pageHoverDelay);
+                };
+
                 const handlePageClick = (pageId) => {
+                    handlePageHoverEnd();
                     if (pageId === currentPage.value) {
                         pageLocked.value = !pageLocked.value;
                     } else {
@@ -927,6 +950,7 @@
                 };
 
                 const handleArrowClick = () => {
+                    handlePageHoverEnd();
                     if (!filteredPageOrder.value.length) return;
                     currentIndex.value = (currentIndex.value + 1) % filteredPageOrder.value.length;
                     currentPage.value = filteredPageOrder.value[currentIndex.value];
@@ -1105,7 +1129,8 @@
                     currentPage,
                     filteredPages,
                     pageLocked,
-                    handlePageChange,
+                    handlePageHoverStart,
+                    handlePageHoverEnd,
                     handlePageClick,
                     handleArrowClick,
                     useAnimation,
