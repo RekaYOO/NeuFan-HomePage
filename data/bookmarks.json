@@ -1028,16 +1028,6 @@
                     ]
                 },
                 {
-                    "name": "谷歌学术镜像2",
-                    "url": "https://xs.essclick.com/",
-                    "aliases": [
-                        "gugexueshujingxiang2",
-                        "ggxsjx2",
-                        "google scholar mirror 2",
-                        "essclick"
-                    ]
-                },
-                {
                     "name": "秘塔AI搜索",
                     "url": "https://metaso.cn",
                     "aliases": [
@@ -1045,6 +1035,16 @@
                         "mtaiss",
                         "metaso",
                         "metaso ai search"
+                    ]
+                },
+                {
+                    "name": "谷歌学术镜像2",
+                    "url": "https://x.sci-hub.org.cn/",
+                    "aliases": [
+                        "gugexueshujingxiang2",
+                        "ggxsjx2",
+                        "google scholar mirror 2",
+                        "essclick"
                     ]
                 }
             ]
