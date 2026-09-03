@@ -546,7 +546,7 @@
                 const webvpnMode = ref(0);
                 // 是否锁定页面（禁用悬浮切换）
                 const pageLocked = ref(false);
-                const pageHoverDelay = 85;
+                const pageHoverDelay = 125;
                 let pageHoverTimer = null;
 
                 // 隐藏列表 - 这些名称默认不显示，需要 ?t=all 参数才显示
@@ -912,6 +912,10 @@
                     }
                 };
 
+                const normalizeSearchText = (text) => String(text || '')
+                    .toLowerCase()
+                    .replace(/[\s_-]+/g, '');
+
                 const handlePageChange = (pageId) => {
                     currentPage.value = pageId;
                     currentIndex.value = filteredPageOrder.value.indexOf(pageId);
@@ -1007,6 +1011,7 @@
                     if (query) {
                         const allResults = [];
                         const lowerQuery = query.toLowerCase();
+                        const normalizedQuery = normalizeSearchText(query);
 
                     // 遍历所有页面（搜索时显示所有，包括隐藏的）
                     const pagesToSearch = showAll.value ? Object.keys(bookmarks.value) : 
@@ -1018,11 +1023,19 @@
                     pagesToSearch.forEach(pageKey => {
                             const pageBookmarks = bookmarks.value[pageKey];
                             pageBookmarks.forEach(category => {
-                                const matchedLinks = category.links.filter(link =>
-                                    link.name.toLowerCase().includes(lowerQuery) ||
-                                    link.url.toLowerCase().includes(lowerQuery) ||
-                                    (link.aliases && link.aliases.some(alias => alias.toLowerCase().includes(lowerQuery)))
-                                );
+                                const matchedLinks = category.links.filter(link => {
+                                    const searchableValues = [
+                                        link.name,
+                                        link.url,
+                                        ...(Array.isArray(link.aliases) ? link.aliases : [])
+                                    ];
+
+                                    return searchableValues.some(value => {
+                                        const text = String(value || '').toLowerCase();
+                                        return text.includes(lowerQuery) ||
+                                            (normalizedQuery && normalizeSearchText(value).includes(normalizedQuery));
+                                    });
+                                });
 
                                 if (matchedLinks.length > 0) {
                                     // 找到匹配的分类，添加页面信息

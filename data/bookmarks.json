@@ -706,43 +706,42 @@
     ],
     "academic": [
         {
-            "name": "通用检索",
+            "name": "常用检索",
             "links": [
                 {
-                    "name": "CSSCI",
-                    "url": "https://cssci.nju.edu.cn/",
+                    "name": "EBSCO",
+                    "url": "https://search.ebscohost.com/",
                     "aliases": [
-                        "cssci"
+                        "ebsco",
+                        "ebscohost",
+                        "asp",
+                        "bsp"
+                    ]
+                },
+                {
+                    "name": "ScienceDirect",
+                    "url": "https://www.sciencedirect.com/",
+                    "aliases": [
+                        "sciencedirect",
+                        "elsevier"
                     ]
                 },
                 {
                     "name": "Scopus",
                     "url": "https://www.scopus.com",
                     "aliases": [
-                        "scopus"
+                        "scopus",
+                        "elsevier scopus"
                     ]
                 },
                 {
                     "name": "WOS",
                     "url": "https://www.webofscience.com",
                     "aliases": [
-                        "wos"
-                    ]
-                },
-                {
-                    "name": "知网",
-                    "url": "http://www.cnki.net",
-                    "aliases": [
-                        "zhiwang",
-                        "zw"
-                    ]
-                },
-                {
-                    "name": "NEU学术搜索",
-                    "url": "https://neu.bohrium.com/",
-                    "aliases": [
-                        "neuxueshusousuo",
-                        "neuxsss"
+                        "wos",
+                        "web of science",
+                        "webofscience",
+                        "isi"
                     ]
                 },
                 {
@@ -750,203 +749,80 @@
                     "url": "https://scholar.google.com",
                     "aliases": [
                         "gugexueshu",
-                        "ggxs"
+                        "ggxs",
+                        "google scholar",
+                        "scholar"
+                    ]
+                },
+                {
+                    "name": "NEU学术搜索",
+                    "url": "https://neu.bohrium.com/",
+                    "aliases": [
+                        "neuxueshusousuo",
+                        "neuxsss",
+                        "neu academic search",
+                        "bohrium"
                     ]
                 },
                 {
                     "name": "万方数据资源系统",
                     "url": "https://w.wanfangdata.com.cn",
                     "aliases": [
+                        "wanfang",
+                        "wanfangdata",
                         "wanfangshujuziyuanxitong",
                         "wfsjzyxt"
+                    ]
+                },
+                {
+                    "name": "知网",
+                    "url": "http://www.cnki.net",
+                    "aliases": [
+                        "cnki",
+                        "中国知网",
+                        "zhongguozhiwang",
+                        "zgzw",
+                        "zhiwang",
+                        "zw"
                     ]
                 }
             ]
         },
         {
-            "name": "官方数据库",
+            "name": "全文数据库",
             "links": [
                 {
                     "name": "ACM",
                     "url": "https://dl.acm.org/",
                     "aliases": [
-                        "acm"
+                        "acm",
+                        "acm digital library",
+                        "acmdl"
                     ]
                 },
                 {
                     "name": "ACS",
                     "url": "http://pubs.acs.org",
                     "aliases": [
-                        "acs"
-                    ]
-                },
-                {
-                    "name": "ASM",
-                    "url": "https://asm.mpds.io/#start",
-                    "aliases": [
-                        "asm"
+                        "acs",
+                        "acs publications",
+                        "american chemical society"
                     ]
                 },
                 {
                     "name": "AIP",
                     "url": "https://pubs.aip.org/",
                     "aliases": [
-                        "aip"
+                        "aip",
+                        "american institute of physics"
                     ]
                 },
                 {
                     "name": "APS",
                     "url": "http://journals.aps.org/",
                     "aliases": [
-                        "aps"
-                    ]
-                },
-                {
-                    "name": "CJO",
-                    "url": "https://www.cambridge.org/core",
-                    "aliases": [
-                        "cjo"
-                    ]
-                },
-                {
-                    "name": "EBSCO",
-                    "url": "https://search.ebscohost.com/",
-                    "aliases": [
-                        "ebsco"
-                    ]
-                },
-                {
-                    "name": "INFORMS-OL",
-                    "url": "https://pubsonline.informs.org/",
-                    "aliases": [
-                        "informs-ol"
-                    ]
-                },
-                {
-                    "name": "IEL",
-                    "url": "https://ieeexplore.ieee.org/",
-                    "aliases": [
-                        "iel"
-                    ]
-                },
-                {
-                    "name": "Springer",
-                    "url": "https://link.springer.com/",
-                    "aliases": [
-                        "springer"
-                    ]
-                },
-                {
-                    "name": "ScienceDirect",
-                    "url": "https://www.sciencedirect.com/",
-                    "aliases": [
-                        "sciencedirect"
-                    ]
-                },
-                {
-                    "name": "Wiley",
-                    "url": "https://onlinelibrary.wiley.com/",
-                    "aliases": [
-                        "wiley"
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "三方工具",
-            "links": [
-                {
-                    "name": "思谋学术",
-                    "url": "https://ac.scmor.com/",
-                    "aliases": [
-                        "simouxueshu",
-                        "smxs"
-                    ]
-                },
-                {
-                    "name": "谷歌学术镜像1",
-                    "url": "https://xueshu.lanfanshu.cn/",
-                    "aliases": [
-                        "gugexueshujingxiang1",
-                        "ggxsjx1"
-                    ]
-                },
-                {
-                    "name": "谷歌学术镜像2",
-                    "url": "https://xs.essclick.com/",
-                    "aliases": [
-                        "gugexueshujingxiang2",
-                        "ggxsjx2"
-                    ]
-                },
-                {
-                    "name": "秘塔AI搜索",
-                    "url": "https://metaso.cn",
-                    "aliases": [
-                        "mitaaisousuo",
-                        "mtaiss"
-                    ]
-                }
-            ]
-        },
-        {
-            "name": "数据库导航",
-            "links": [
-                {
-                    "name": "超星汇雅电子图书",
-                    "url": "https://hn.sslibrary.com/",
-                    "aliases": [
-                        "chaoxinghuiyadianzitushu",
-                        "cxhydzts"
-                    ]
-                },
-                {
-                    "name": "读秀图书搜索",
-                    "url": "https://www.duxiu.com/",
-                    "aliases": [
-                        "duxiutushusousuo",
-                        "dxtsss"
-                    ]
-                },
-                {
-                    "name": "维普期刊",
-                    "url": "https://qikan.cqvip.com/",
-                    "aliases": [
-                        "weipuqikan",
-                        "wpqk"
-                    ]
-                },
-                {
-                    "name": "EI Compendex",
-                    "url": "https://www.engineeringvillage.com/",
-                    "aliases": [
-                        "ei",
-                        "eicompendex",
-                        "engineeringvillage"
-                    ]
-                },
-                {
-                    "name": "ProQuest Dissertations & Theses",
-                    "url": "https://www.proquest.com/pqdtglobal/",
-                    "aliases": [
-                        "pqdt",
-                        "proquestdissertationsandtheses"
-                    ]
-                },
-                {
-                    "name": "Emerald",
-                    "url": "https://www.emerald.com/insight/",
-                    "aliases": [
-                        "emerald",
-                        "emeraldinsight"
-                    ]
-                },
-                {
-                    "name": "RSC",
-                    "url": "https://pubs.rsc.org/",
-                    "aliases": [
-                        "rsc",
-                        "royalsocietyofchemistry"
+                        "aps",
+                        "american physical society"
                     ]
                 },
                 {
@@ -954,6 +830,7 @@
                     "url": "https://ascelibrary.org/",
                     "aliases": [
                         "asce",
+                        "asce library",
                         "ascelibrary"
                     ]
                 },
@@ -962,15 +839,45 @@
                     "url": "https://asmedigitalcollection.asme.org/",
                     "aliases": [
                         "asme",
+                        "asme digital collection",
                         "asmedigitalcollection"
                     ]
                 },
                 {
-                    "name": "Taylor & Francis",
-                    "url": "https://www.tandfonline.com/",
+                    "name": "CJO",
+                    "url": "https://www.cambridge.org/core",
                     "aliases": [
-                        "t&f",
-                        "taylorandfrancis"
+                        "cjo",
+                        "cambridge journals online",
+                        "cambridge"
+                    ]
+                },
+                {
+                    "name": "Emerald",
+                    "url": "https://www.emerald.com/insight/",
+                    "aliases": [
+                        "emerald",
+                        "emeraldinsight",
+                        "emerald insight"
+                    ]
+                },
+                {
+                    "name": "IEL",
+                    "url": "https://ieeexplore.ieee.org/",
+                    "aliases": [
+                        "iel",
+                        "ieeexplore",
+                        "ieee xplore",
+                        "ieee"
+                    ]
+                },
+                {
+                    "name": "INFORMS-OL",
+                    "url": "https://pubsonline.informs.org/",
+                    "aliases": [
+                        "informs-ol",
+                        "informs",
+                        "informs online"
                     ]
                 },
                 {
@@ -978,7 +885,180 @@
                     "url": "https://www.jstor.org/",
                     "aliases": [
                         "jstor",
+                        "journal storage",
                         "journalstorage"
+                    ]
+                },
+                {
+                    "name": "Nature",
+                    "url": "https://www.nature.com/",
+                    "aliases": [
+                        "nature",
+                        "nature journal",
+                        "naturejournal"
+                    ]
+                },
+                {
+                    "name": "ProQuest Dissertations & Theses",
+                    "url": "https://www.proquest.com/pqdtglobal/",
+                    "aliases": [
+                        "pqdt",
+                        "proquest",
+                        "proquest dissertations and theses",
+                        "proquestdissertationsandtheses"
+                    ]
+                },
+                {
+                    "name": "RSC",
+                    "url": "https://pubs.rsc.org/",
+                    "aliases": [
+                        "rsc",
+                        "royal society of chemistry",
+                        "royalsocietyofchemistry"
+                    ]
+                },
+                {
+                    "name": "Springer",
+                    "url": "https://link.springer.com/",
+                    "aliases": [
+                        "springer",
+                        "springerlink"
+                    ]
+                },
+                {
+                    "name": "Taylor & Francis",
+                    "url": "https://www.tandfonline.com/",
+                    "aliases": [
+                        "t&f",
+                        "taylor francis",
+                        "taylorandfrancis"
+                    ]
+                },
+                {
+                    "name": "Wiley",
+                    "url": "https://onlinelibrary.wiley.com/",
+                    "aliases": [
+                        "wiley",
+                        "wiley online library"
+                    ]
+                },
+                {
+                    "name": "超星汇雅电子图书",
+                    "url": "https://hn.sslibrary.com/",
+                    "aliases": [
+                        "chaoxinghuiyadianzitushu",
+                        "cxhydzts",
+                        "超星",
+                        "汇雅",
+                        "sslibrary"
+                    ]
+                },
+                {
+                    "name": "读秀图书搜索",
+                    "url": "https://www.duxiu.com/",
+                    "aliases": [
+                        "duxiu",
+                        "duxiutushusousuo",
+                        "dxtsss",
+                        "读秀"
+                    ]
+                },
+                {
+                    "name": "维普期刊",
+                    "url": "https://qikan.cqvip.com/",
+                    "aliases": [
+                        "weipuqikan",
+                        "wpqk",
+                        "vip",
+                        "cqvip",
+                        "维普"
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "索引数据库",
+            "links": [
+                {
+                    "name": "CSSCI",
+                    "url": "https://cssci.nju.edu.cn/",
+                    "aliases": [
+                        "cssci",
+                        "中文社会科学引文索引",
+                        "zhongwenshehuikexueyinwensuoyin",
+                        "zwshkxywsy",
+                        "南大核心",
+                        "nandahexin",
+                        "ndhx"
+                    ]
+                },
+                {
+                    "name": "EI Compendex",
+                    "url": "https://www.engineeringvillage.com/",
+                    "aliases": [
+                        "ei",
+                        "ei compendex",
+                        "eicompendex",
+                        "engineering village",
+                        "engineeringvillage"
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "第三方工具",
+            "links": [
+                {
+                    "name": "思谋学术",
+                    "url": "https://ac.scmor.com/",
+                    "aliases": [
+                        "simouxueshu",
+                        "smxs",
+                        "scmor"
+                    ]
+                },
+                {
+                    "name": "谷歌学术镜像1",
+                    "url": "https://xueshu.lanfanshu.cn/",
+                    "aliases": [
+                        "gugexueshujingxiang1",
+                        "ggxsjx1",
+                        "google scholar mirror 1",
+                        "lanfanshu"
+                    ]
+                },
+                {
+                    "name": "谷歌学术镜像2",
+                    "url": "https://xs.essclick.com/",
+                    "aliases": [
+                        "gugexueshujingxiang2",
+                        "ggxsjx2",
+                        "google scholar mirror 2",
+                        "essclick"
+                    ]
+                },
+                {
+                    "name": "秘塔AI搜索",
+                    "url": "https://metaso.cn",
+                    "aliases": [
+                        "mitaaisousuo",
+                        "mtaiss",
+                        "metaso",
+                        "metaso ai search"
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "其他数据库",
+            "links": [
+                {
+                    "name": "ASM",
+                    "url": "https://asm.mpds.io/#start",
+                    "aliases": [
+                        "asm",
+                        "asm materials",
+                        "asm mpds"
                     ]
                 },
                 {
@@ -987,15 +1067,9 @@
                     "aliases": [
                         "cas",
                         "scifinder",
-                        "scifindern"
-                    ]
-                },
-                {
-                    "name": "Nature",
-                    "url": "https://www.nature.com/",
-                    "aliases": [
-                        "nature",
-                        "naturejournal"
+                        "scifinder-n",
+                        "scifindern",
+                        "cas scifinder"
                     ]
                 }
             ]

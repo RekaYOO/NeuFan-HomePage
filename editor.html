@@ -333,6 +333,29 @@
             gap: 10px;
         }
 
+        .category-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .category-sort-button {
+            padding: 5px 10px;
+            border: 1px solid #4CAF50;
+            border-radius: 6px;
+            background: #fff;
+            color: #2e7d32;
+            font: inherit;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        .category-sort-button:hover {
+            background: #4CAF50;
+            color: #fff;
+        }
+
         .category-toggle {
             font-size: 1.2rem;
             transition: transform 0.3s;
@@ -601,7 +624,7 @@
                                 <label>类别</label>
                                 <select v-model="editBookmark.category" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1rem;">
                                     <option value="">选择类别</option>
-                                    <option v-for="cat in allCategories" :key="cat" :value="cat">{{ cat }}</option>
+                                    <option v-for="cat in editCategories" :key="cat" :value="cat">{{ cat }}</option>
                                     <option value="__custom__">+ 输入新类别</option>
                                 </select>
                                 <input v-if="editBookmark.category === '__custom__'" 
@@ -662,7 +685,14 @@
                                             <span class="category-toggle" :class="{ collapsed: collapsedCategories[group.category] }">▼</span>
                                             <span>{{ group.category }}</span>
                                         </div>
-                                        <span class="category-count">{{ group.items.length }}</span>
+                                        <div class="category-header-actions">
+                                            <button class="category-sort-button"
+                                                    @click.stop="sortCategory(group.category)"
+                                                    title="纯英文名称在前，含中文名称按拼音排列">
+                                                A-Z 排序
+                                            </button>
+                                            <span class="category-count">{{ group.items.length }}</span>
+                                        </div>
                                     </div>
                                     <div class="category-content" 
                                          :class="{ collapsed: collapsedCategories[group.category] }">
@@ -770,15 +800,10 @@
                     return pageData.map(cat => cat.name);
                 });
 
-                const allCategories = computed(() => {
+                const editCategories = computed(() => {
                     if (!bookmarks.value) return [];
-                    const categories = new Set();
-                    Object.values(bookmarks.value).forEach(pageData => {
-                        pageData.forEach(cat => {
-                            categories.add(cat.name);
-                        });
-                    });
-                    return Array.from(categories);
+                    const page = selectedBookmark.value?.page || currentPage.value;
+                    return (bookmarks.value[page] || []).map(category => category.name);
                 });
 
                 const groupedBookmarks = computed(() => {
@@ -818,7 +843,19 @@
 
                 const parseAliases = (str) => {
                     if (!str || !str.trim()) return [];
-                    return str.split(/[,，]/).map(s => s.trim()).filter(s => s);
+                    return str.split(/[,，]/).map(s => s.trim()).filter(Boolean);
+                };
+
+                const buildAliases = (name, aliasesText) => {
+                    const aliases = [...parseAliases(aliasesText), ...computeAliases(name)];
+                    const seen = new Set();
+
+                    return aliases.filter(alias => {
+                        const normalized = alias.toLowerCase();
+                        if (!normalized || seen.has(normalized)) return false;
+                        seen.add(normalized);
+                        return true;
+                    });
                 };
 
                 const maybeAutoFillAliases = (bookmark) => {
@@ -826,6 +863,53 @@
                     if (bookmark.aliases && bookmark.aliases.trim()) return;
                     const computed = computeAliases(bookmark.name);
                     bookmark.aliases = computed.join(', ');
+                };
+
+                const containsChinese = (text) => /[\u3400-\u9fff]/.test(String(text || ''));
+                const alphabeticCollator = new Intl.Collator('en', {
+                    sensitivity: 'base',
+                    numeric: true
+                });
+                const normalizeAlphabeticName = (text) => String(text || '')
+                    .toLowerCase()
+                    .replace(/[^a-z0-9]+/g, '');
+
+                const bookmarkSortKey = (link) => {
+                    const name = String(link.name || '');
+                    const hasChinese = containsChinese(name);
+                    const alphabeticName = containsChinese(name)
+                        ? computeAliases(name)[0] || name
+                        : name;
+                    return {
+                        group: hasChinese ? 1 : 0,
+                        value: normalizeAlphabeticName(alphabeticName),
+                        name
+                    };
+                };
+
+                const compareBookmarks = (left, right) => {
+                    const leftKey = bookmarkSortKey(left);
+                    const rightKey = bookmarkSortKey(right);
+                    if (leftKey.group !== rightKey.group) return leftKey.group - rightKey.group;
+
+                    return alphabeticCollator.compare(leftKey.value, rightKey.value) ||
+                        leftKey.name.localeCompare(rightKey.name, 'zh-CN');
+                };
+
+                const sortCategory = (categoryName) => {
+                    const category = (bookmarks.value?.[currentPage.value] || [])
+                        .find(item => item.name === categoryName);
+                    if (!category || category.links.length < 2) {
+                        showAlert('info', '当前分类无需排序');
+                        return;
+                    }
+
+                    category.links = category.links
+                        .map((link, index) => ({ link, index }))
+                        .sort((left, right) => compareBookmarks(left.link, right.link) || left.index - right.index)
+                        .map(item => item.link);
+                    selectedBookmark.value = null;
+                    showAlert('success', `“${categoryName}”已按名称排序`);
                 };
 
                 const setCategoryRef = (category, el) => {
@@ -1009,7 +1093,7 @@
                         bookmarks.value[page].push(category);
                     }
 
-                    const aliases = parseAliases(newBookmark.value.aliases);
+                    const aliases = buildAliases(newBookmark.value.name, newBookmark.value.aliases);
                     category.links.push({
                         name: newBookmark.value.name,
                         url: newBookmark.value.url,
@@ -1095,7 +1179,7 @@
                         bookmarks.value[page].push(newCat);
                     }
 
-                    const aliases = parseAliases(editBookmark.value.aliases);
+                    const aliases = buildAliases(editBookmark.value.name, editBookmark.value.aliases);
                     newCat.links.push({
                         name: editBookmark.value.name,
                         url: editBookmark.value.url,
@@ -1281,7 +1365,7 @@
                     currentPage,
                     pages,
                     currentCategories,
-                    allCategories,
+                    editCategories,
                     groupedBookmarks,
                     newBookmark,
                     customPage,
@@ -1298,6 +1382,7 @@
                     saveEdit,
                     cancelEdit,
                     deleteBookmark,
+                    sortCategory,
                     toggleCategory,
                     handleSave,
                     setCategoryRef,
